@@ -1,0 +1,18 @@
+{
+  "name": "react-native-foxit-pdf",
+  "version": "0.0.1",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/APPrise-Mobile/react-native-foxit-pdf.git"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/APPrise-Mobile/react-native-foxit-pdf/issues"
+  },
+  "homepage": "https://github.com/APPrise-Mobile/react-native-foxit-pdf#readme"
+}
