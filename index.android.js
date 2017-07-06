@@ -7,7 +7,7 @@ export default {
     return ReactNativeFoxitPdf.init(sn, key, onSuccess, onFailure)
   },
 
-  openPdf: (uri, onSuccess, onFailure) => {
-    return ReactNativeFoxitPdf.openPdf(uri, onSuccess, onFailure);
+  openPdf: (uri, annotationsEnabled, onSuccess, onFailure) => {
+    return ReactNativeFoxitPdf.openPdf(uri, annotationsEnabled, onSuccess, onFailure);
   }
 };

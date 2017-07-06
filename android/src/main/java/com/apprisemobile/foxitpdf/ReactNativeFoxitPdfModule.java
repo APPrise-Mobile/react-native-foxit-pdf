@@ -43,7 +43,7 @@ class ReactNativeFoxitPdfModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void openPdf(final String filePath, final Callback onSuccess, final Callback onFailure) {
+    public void openPdf(final String filePath, final boolean annotationsEnabled, final Callback onSuccess, final Callback onFailure) {
         final String path = filePath.replace("file://", "");
         if (path == null || path.trim().length() < 1) {
             onFailure.invoke("Please input validate path.");
@@ -56,6 +56,7 @@ class ReactNativeFoxitPdfModule extends ReactContextBaseJavaModule {
 
         final Intent intent = new Intent(getCurrentActivity(), ReactNativeFoxitPdfActivity.class);
         intent.putExtra("path", path);
+        intent.putExtra("annotationsEnabled", annotationsEnabled);
         getCurrentActivity().startActivity(intent);
     }
 }

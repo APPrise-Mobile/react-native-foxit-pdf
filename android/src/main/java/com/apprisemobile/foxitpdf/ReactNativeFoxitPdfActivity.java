@@ -20,6 +20,7 @@ public class ReactNativeFoxitPdfActivity extends Activity {
         super.onCreate(savedInstanceState);
         final Bundle bundle = getIntent().getExtras();
         final String path = bundle.getString("path");
+        final boolean annotationsEnabled = bundle.getBoolean("annotationsEnabled");
         final RelativeLayout relativeLayout = new RelativeLayout(this);
         final RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
@@ -32,14 +33,16 @@ public class ReactNativeFoxitPdfActivity extends Activity {
         relativeLayout.setDrawingCacheEnabled(true);
         setContentView(relativeLayout);
 
+        final String annotationsEnabledString = annotationsEnabled ? "true" : "false";
+
         final String UIExtensionsConfig = "{\n" +
             "    \"defaultReader\": true,\n" +
             "    \"modules\": {\n" +
             "        \"readingbookmark\": true,\n" +
             "        \"outline\": true,\n" +
-            "        \"annotations\": true,\n" +
+            "        \"annotations\": " + annotationsEnabledString + ",\n" +
             "        \"thumbnail\" : false,\n" +
-            "        \"attachment\": true,\n" +
+            "        \"attachment\": false,\n" +
             "        \"signature\": false,\n" +
             "        \"search\": true,\n" +
             "        \"pageNavigation\": true,\n" +
