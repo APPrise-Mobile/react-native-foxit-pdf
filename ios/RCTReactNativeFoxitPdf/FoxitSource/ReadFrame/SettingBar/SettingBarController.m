@@ -19,24 +19,24 @@
     UIControl* _maskView;
 }
 
--(instancetype)initWithPDFViewCtrl:(FSPDFViewCtrl*)pdfViewCtrl
+-(instancetype)initWithPDFViewCtrl:(FSPDFViewCtrl*)pdfViewCtrl options:(NSDictionary*)options
 {
     self = [super init];
     if (self) {
         _superView = pdfViewCtrl;
-        
+
         _maskView = [[UIControl alloc] initWithFrame:[UIScreen mainScreen].bounds];
         _maskView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleHeight;
-        
+
         CGRect screenFrame = [UIScreen mainScreen].bounds;
         if (!OS_ISVERSION8 && UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
             screenFrame = CGRectMake(0, 0, screenFrame.size.height, screenFrame.size.width);
         }
 
-        self.settingBar = [[SettingBar alloc] initWithPDFViewCtrl:pdfViewCtrl moreSettingBarController:self];
-        self.settingBar.contentView.frame = CGRectMake(0, screenFrame.size.height-250, screenFrame.size.width, DEVICE_iPHONE ? 240 : 200);
+        self.settingBar = [[SettingBar alloc] initWithPDFViewCtrl:pdfViewCtrl moreSettingBarController:self options:options];
+        self.settingBar.contentView.frame = CGRectMake(0, screenFrame.size.height-250, screenFrame.size.width, DEVICE_iPHONE ? 140 : 120);
         self.settingBar.contentView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
-        
+
         [_superView addSubview:self.settingBar.contentView];
         self.hiddenSettingBar = YES;
     }
@@ -54,7 +54,7 @@
     {
         self.settingBar.singleView_ipad.selected = (newLayoutMode == PDF_LAYOUT_MODE_SINGLE?YES:NO);
     }
-    
+
     if (DEVICE_iPHONE) {
         self.settingBar.continueView_iphone.selected = (newLayoutMode == PDF_LAYOUT_MODE_CONTINUOUS?YES:NO);
     }
@@ -62,9 +62,9 @@
     {
         self.settingBar.continueView_ipad.selected = (newLayoutMode == PDF_LAYOUT_MODE_CONTINUOUS?YES:NO);
     }
-    
+
     self.settingBar.doubleView_ipad.selected = (newLayoutMode == PDF_LAYOUT_MODE_TWO?YES:NO);
-    
+
     if (DEVICE_iPHONE) {
         self.settingBar.thumbnailView_iphone.selected = (newLayoutMode == PDF_LAYOUT_MODE_MULTIPLE?YES:NO);
     }
@@ -85,10 +85,10 @@
         [UIView animateWithDuration:0.4 animations:^{
             _maskView.alpha = 0.1f;
         } completion:^(BOOL finished) {
-            
+
             [_maskView removeFromSuperview];
         }];
-        
+
         CGRect newFrame = self.settingBar.contentView.frame;
         newFrame.origin.y = [UIScreen mainScreen].bounds.size.height;
         [UIView animateWithDuration:0.4 animations:^{
@@ -108,7 +108,7 @@
         _maskView.alpha = 0.3f;
         _maskView.tag = 203;
         [_maskView addTarget:self action:@selector(dismiss:) forControlEvents:UIControlEventTouchUpInside];
-        
+
         [_superView insertSubview:_maskView belowSubview:self.settingBar.contentView];
         [_maskView mas_remakeConstraints:^(MASConstraintMaker *make) {
             make.left.equalTo(_maskView.superview.mas_left).offset(0);
@@ -116,7 +116,7 @@
             make.top.equalTo(_maskView.superview.mas_top).offset(0);
             make.bottom.equalTo(_maskView.superview.mas_bottom).offset(0);
         }];
-        
+
         CGRect newFrame = self.settingBar.contentView.frame;
         newFrame.origin.y = [UIScreen mainScreen].bounds.size.height - newFrame.size.height;
         [UIView animateWithDuration:0.4 animations:^{

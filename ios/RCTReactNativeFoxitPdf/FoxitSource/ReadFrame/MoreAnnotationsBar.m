@@ -53,60 +53,63 @@
 @implementation MoreAnnotationsBar
 
 
--(MoreAnnotationsBar*)init:(CGRect)frame
+-(MoreAnnotationsBar*)init:(CGRect)frame options:(NSDictionary*)options
 {
     self = [super init];
     if (self) {
         self.contentView = [[UIView alloc] initWithFrame:frame];
         self.contentView.backgroundColor = [UIColor whiteColor];
-        
+
         //TextMarkup
         self.textLabel = [[UILabel alloc] init];
         self.textLabel.text = NSLocalizedString(@"kMoreTextMarkup", nil);
         self.textLabel.font = [UIFont systemFontOfSize:16.0f];
         self.textLabel.textColor = [UIColor darkGrayColor];
         [self.contentView addSubview:self.textLabel];
-        
-        
+
+
         UIImage *hightImage = [UIImage imageNamed:@"annot_hight"];
         UIImage *underlineImage = [UIImage imageNamed:@"annot_underline"];
         UIImage *breaklineImage = [UIImage imageNamed:@"annot_breakline"];
         UIImage *strokeoutImage = [UIImage imageNamed:@"annot_strokeout"];
         UIImage *replaceImage = [UIImage imageNamed:@"annot_replace"];
         UIImage *insertImage = [UIImage imageNamed:@"annot_insert"];
-        
+
         self.highlightBtn = [MoreAnnotationsBar createItemWithImage:hightImage];
         self.underlineBtn = [MoreAnnotationsBar createItemWithImage:underlineImage];
         self.breaklineBtn = [MoreAnnotationsBar createItemWithImage:breaklineImage];
         self.strokeoutBtn = [MoreAnnotationsBar createItemWithImage:strokeoutImage];
         self.replaceBtn = [MoreAnnotationsBar createItemWithImage:replaceImage];
         self.insertBtn = [MoreAnnotationsBar createItemWithImage:insertImage];
-        
+
         self.highlightBtn.frame = CGRectMake(0, 100, hightImage.size.width, hightImage.size.height);
         self.underlineBtn.frame = CGRectMake(0, 100, underlineImage.size.width, underlineImage.size.height);
         self.breaklineBtn.frame = CGRectMake(0, 100, breaklineImage.size.width, breaklineImage.size.height);
         self.strokeoutBtn.frame = CGRectMake(0, 100, strokeoutImage.size.width, strokeoutImage.size.height);
         self.insertBtn.frame = CGRectMake(0, 100, insertImage.size.width, insertImage.size.height);
         self.replaceBtn.frame = CGRectMake(0, 100, replaceImage.size.width, replaceImage.size.height);
-        
+
         [self.contentView addSubview:self.highlightBtn];
         [self.contentView addSubview:self.underlineBtn];
         [self.contentView addSubview:self.breaklineBtn];
         [self.contentView addSubview:self.strokeoutBtn];
-        [self.contentView addSubview:self.insertBtn];
-        [self.contentView addSubview:self.replaceBtn];
-        
+        BOOL isEditTextEnabled = [[options valueForKey:@"isEditTextEnabled"] boolValue];
+        if (isEditTextEnabled) {
+          [self.contentView addSubview:self.insertBtn];
+          [self.contentView addSubview:self.replaceBtn];
+        }
+
         self.divideView1 = [[UIView alloc] init];
         self.divideView1.backgroundColor = [UIColor colorWithRGBHex:0xe6e6e6];
         [self.contentView addSubview:self.divideView1];
-        
+
         //Drawing
         self.drawLabel = [[UILabel alloc] init];
         self.drawLabel.text = NSLocalizedString(@"kMoreDrawing", nil);
         self.drawLabel.font = [UIFont systemFontOfSize:16.0f];
         self.drawLabel.textColor = [UIColor darkGrayColor];
         [self.contentView addSubview:self.drawLabel];
-        
+
         UIImage *lineImage = [UIImage imageNamed:@"annot_line"];
         UIImage *rectImage = [UIImage imageNamed:@"annot_rect"];
         UIImage *circleImage = [UIImage imageNamed:@"annot_circle"];
@@ -119,26 +122,26 @@
         self.arrowsBtn = [MoreAnnotationsBar createItemWithImage:arrowsImage];
         self.pencileBtn = [MoreAnnotationsBar createItemWithImage:pencileImage];
         self.eraserBtn = [MoreAnnotationsBar createItemWithImage:eraserImage];
-        
+
         self.lineBtn.frame = CGRectMake(0, 100, lineImage.size.width, lineImage.size.height);
         self.rectBtn.frame = CGRectMake(0, 100, rectImage.size.width, rectImage.size.height);
         self.circleBtn.frame = CGRectMake(0, 100, circleImage.size.width, circleImage.size.height);
         self.arrowsBtn.frame = CGRectMake(0, 100, arrowsImage.size.width, arrowsImage.size.height);
         self.pencileBtn.frame = CGRectMake(0, 100, pencileImage.size.width, pencileImage.size.height);
         self.eraserBtn.frame = CGRectMake(0, 100, eraserImage.size.width, eraserImage.size.height);
-        
+
         [self.contentView addSubview:self.lineBtn];
         [self.contentView addSubview:self.rectBtn];
         [self.contentView addSubview:self.circleBtn];
         [self.contentView addSubview:self.arrowsBtn];
         [self.contentView addSubview:self.pencileBtn];
         [self.contentView addSubview:self.eraserBtn];
-        
+
         self.divideView2 = [[UIView alloc] init];
         self.divideView2.backgroundColor = [UIColor colorWithRGBHex:0xe6e6e6];
         [self.contentView addSubview:self.divideView2];
-        
-        
+
+
         self.rectBtn.center = CGPointMake((frame.size.width-20)/12, 120);
         self.circleBtn.center = CGPointMake((frame.size.width-20)/12*3, 120);
         self.lineBtn.center = CGPointMake((frame.size.width-20)/12*5, 120);
@@ -153,31 +156,46 @@
         self.othersLabel.font = [UIFont systemFontOfSize:16.0f];
         self.othersLabel.textColor = [UIColor darkGrayColor];
         [self.contentView addSubview:self.othersLabel];
-        
+
 
         UIImage *typeriterImage = [UIImage imageNamed:@"annot_typewriter_more"];
         UIImage *noteImage = [UIImage imageNamed:@"annot_note_more"];
         UIImage *stampImage = [UIImage imageNamed:@"annot_stamp_more"];
         UIImage *attachmentImage = [UIImage imageNamed:@"annot_attachment_more"];
-        
+
         self.typewriterBtn = [MoreAnnotationsBar createItemWithImageAndTitle:NSLocalizedString(@"kTypewriter", nil) imageNormal:typeriterImage];
-        self.noteBtn = [MoreAnnotationsBar createItemWithImageAndTitle:NSLocalizedString(@"kNote", nil) imageNormal:noteImage];
-        self.attachmentBtn = [MoreAnnotationsBar createItemWithImageAndTitle:NSLocalizedString(@"kAttachment", nil) imageNormal:attachmentImage];
-        self.stampBtn = [MoreAnnotationsBar createItemWithImageAndTitle:NSLocalizedString(@"kPropertyStamps", nil) imageNormal:stampImage];
-        
+        BOOL isCommentEnabled = [[options valueForKey:@"isCommentEnabled"] boolValue];
+        if (isCommentEnabled) {
+          self.noteBtn = [MoreAnnotationsBar createItemWithImageAndTitle:NSLocalizedString(@"kNote", nil) imageNormal:noteImage];
+        }
+        BOOL isAttachmentEnabled = [[options valueForKey:@"isAttachmentEnabled"] boolValue];
+        if (isAttachmentEnabled) {
+          self.attachmentBtn = [MoreAnnotationsBar createItemWithImageAndTitle:NSLocalizedString(@"kAttachment", nil) imageNormal:attachmentImage];
+        }
+        BOOL isStampEnabled = [[options valueForKey:@"isStampEnabled"] boolValue];
+        if (isStampEnabled) {
+          self.stampBtn = [MoreAnnotationsBar createItemWithImageAndTitle:NSLocalizedString(@"kPropertyStamps", nil) imageNormal:stampImage];
+        }
+
         self.typewriterBtn.center = CGPointMake((frame.size.width-20)/8, 210);
         self.noteBtn.center = CGPointMake((frame.size.width-20)/8*3, 210);
-        self.attachmentBtn.center = CGPointMake((frame.size.width-20)/8*5, 210);
-        self.stampBtn.center = CGPointMake((frame.size.width-20)/8*7, 210);
-        
+        if (isAttachmentEnabled) {
+          self.attachmentBtn.center = CGPointMake((frame.size.width-20)/8*5, 210);
+          self.stampBtn.center = CGPointMake((frame.size.width-20)/8*7, 210);
+        } else {
+          self.stampBtn.center = CGPointMake((frame.size.width-20)/8*5, 210);
+        }
+
         [self.contentView addSubview:self.typewriterBtn];
         [self.contentView addSubview:self.noteBtn];
-        [self.contentView addSubview:self.attachmentBtn];
+        if (isAttachmentEnabled) {
+          [self.contentView addSubview:self.attachmentBtn];
+        }
         [self.contentView addSubview:self.stampBtn];
 
         [self buildLayout];
         [self onItemOnClicked];
-        
+
     }
     return self;
 }
@@ -192,22 +210,22 @@
         make.width.mas_equalTo(200);
         make.height.mas_equalTo(20);
     }];
-    
+
     [self.drawLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(self.rectBtn.mas_left).offset(0);
         make.top.equalTo(self.contentView.mas_top).offset(80);
         make.width.mas_equalTo(200);
         make.height.mas_equalTo(20);
     }];
-    
+
     [self.othersLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(self.rectBtn.mas_left).offset(0);
         make.top.equalTo(self.contentView.mas_top).offset(160);
         make.width.mas_equalTo(200);
         make.height.mas_equalTo(20);
     }];
-    
-    
+
+
     [self.highlightBtn mas_remakeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(self.rectBtn.mas_left).offset(0);
         make.top.equalTo(self.textLabel.mas_bottom).offset(10);
@@ -244,22 +262,22 @@
         make.width.mas_equalTo(self.insertBtn.bounds.size.width);
         make.height.mas_equalTo(self.insertBtn.bounds.size.height);
     }];
-    
-    
+
+
     [self.divideView1 mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(self.contentView.mas_left).offset(5);
         make.right.equalTo(self.contentView.mas_right).offset(-5);
         make.top.equalTo(self.contentView.mas_top).offset(75);
         make.height.mas_equalTo([Utility realPX:1.0f]);
     }];
-    
+
     [self.divideView2 mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(self.contentView.mas_left).offset(5);
         make.right.equalTo(self.contentView.mas_right).offset(-5);
         make.top.equalTo(self.contentView.mas_top).offset(150);
         make.height.mas_equalTo([Utility realPX:1.0f]);
     }];
-    
+
 }
 
 
@@ -271,16 +289,16 @@
     [self.strokeoutBtn addTarget:self action:@selector(onStrikeOutClicked) forControlEvents:UIControlEventTouchUpInside];
     [self.replaceBtn addTarget:self action:@selector(onReplaceClicked) forControlEvents:UIControlEventTouchUpInside];
     [self.insertBtn addTarget:self action:@selector(onInsertClicked) forControlEvents:UIControlEventTouchUpInside];
-    
+
     [self.lineBtn addTarget:self action:@selector(onLineClicked) forControlEvents:UIControlEventTouchUpInside];
     [self.rectBtn addTarget:self action:@selector(onRectClicked) forControlEvents:UIControlEventTouchUpInside];
     [self.circleBtn addTarget:self action:@selector(onCircleClicked) forControlEvents:UIControlEventTouchUpInside];
     [self.arrowsBtn addTarget:self action:@selector(onArrowsClicked) forControlEvents:UIControlEventTouchUpInside];
     [self.pencileBtn addTarget:self action:@selector(onPencilClicked) forControlEvents:UIControlEventTouchUpInside];
     [self.eraserBtn addTarget:self action:@selector(onEraserClicked) forControlEvents:UIControlEventTouchUpInside];
-    
+
     [self.typewriterBtn addTarget:self action:@selector(onTyperwriterClicked) forControlEvents:UIControlEventTouchUpInside];
-    
+
     [self.noteBtn addTarget:self action:@selector(onNoteClicked) forControlEvents:UIControlEventTouchUpInside];
     [self.attachmentBtn addTarget:self action:@selector(onAttachClicked) forControlEvents:UIControlEventTouchUpInside];
     [self.stampBtn addTarget:self action:@selector(onStampClicked) forControlEvents:UIControlEventTouchUpInside];
@@ -412,46 +430,46 @@
 {
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
     CGSize titleSize = [Utility getTextSize:title fontSize:12.0f maxSize:CGSizeMake(300, 200)];
-    
+
     float width = imageNormal.size.width ;
     float height = imageNormal.size.height ;
     button.contentMode = UIViewContentModeScaleToFill;
     [button setImage:imageNormal forState:UIControlStateNormal];
     [button setImage:[MoreAnnotationsBar imageByApplyingAlpha:imageNormal alpha:0.5] forState:UIControlStateHighlighted];
     [button setImage:[MoreAnnotationsBar imageByApplyingAlpha:imageNormal alpha:0.5] forState:UIControlStateSelected];
-    
+
     [button setTitle:title forState:UIControlStateNormal];
     [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [button setTitleColor:[UIColor grayColor] forState:UIControlStateHighlighted];
     [button setTitleColor:[UIColor grayColor] forState:UIControlStateSelected];
     button.titleLabel.font = [UIFont systemFontOfSize:12.0f];
-    
+
     button.titleEdgeInsets = UIEdgeInsetsMake(0, -width, -height, 0);
     button.imageEdgeInsets = UIEdgeInsetsMake(-titleSize.height, 0, 0, -titleSize.width);
     button.frame = CGRectMake(0, 0, titleSize.width > width ? titleSize.width + 2: width,  titleSize.height + height);
-    
+
     return button;
 }
 
 + (UIImage *)imageByApplyingAlpha:(UIImage*)image alpha:(CGFloat) alpha {
     UIGraphicsBeginImageContextWithOptions(image.size, NO, 0.0f);
-    
+
     CGContextRef ctx = UIGraphicsGetCurrentContext();
     CGRect area = CGRectMake(0, 0, image.size.width, image.size.height);
-    
+
     CGContextScaleCTM(ctx, 1, -1);
     CGContextTranslateCTM(ctx, 0, -area.size.height);
-    
+
     CGContextSetBlendMode(ctx, kCGBlendModeMultiply);
-    
+
     CGContextSetAlpha(ctx, alpha);
-    
+
     CGContextDrawImage(ctx, area, image.CGImage);
-    
+
     UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
-    
+
     UIGraphicsEndImageContext();
-    
+
     return newImage;
 }
 

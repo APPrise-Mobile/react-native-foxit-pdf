@@ -80,8 +80,10 @@ typedef void (^ AnnotAuthorCallBack)();
 @property (nonatomic, strong) NSMutableArray *stateChangeListeners;
 @property (nonatomic, assign) BOOL isDocModified;
 
+@property (nonatomic, assign) BOOL isReadOnly;
+
 +(instancetype)sharedInstance;
--(id)initWithPdfViewCtrl:(FSPDFViewCtrl *)pdfViewCtrl;
+-(id)initWithPdfViewCtrl:(FSPDFViewCtrl *)pdfViewCtrl options:(NSDictionary*)options;
 
 -(void)registerFullScreenListener:(id<IFullScreenListener>)listener;
 -(void)unregisterFullScreenListener:(id<IFullScreenListener>)listener;

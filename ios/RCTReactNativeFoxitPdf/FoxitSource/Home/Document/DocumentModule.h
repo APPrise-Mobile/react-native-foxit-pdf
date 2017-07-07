@@ -23,7 +23,7 @@
     FileSortType sortType;
     FileSortMode sortMode;
     int viewMode;
-    
+
 	TbBaseBar *topToolbar;
 	UIView *contentView;
     FbFileBrowser * browser;
@@ -37,7 +37,7 @@
     UIImageView *nameimage;
     UIImageView *sizeimage;
     TbBaseItem *thumbnailItem;
-    
+
     BOOL isShowMorePopover;
     BOOL isShowSortPopover;
 }
@@ -48,4 +48,3 @@
 -(UIView *)getTopToolbar;
 -(UIView *)getContentView;
 @end
-

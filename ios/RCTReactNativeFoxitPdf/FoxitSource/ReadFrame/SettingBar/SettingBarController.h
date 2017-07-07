@@ -19,6 +19,6 @@
 @property (nonatomic, strong) SettingBar* settingBar;
 @property (nonatomic, assign) BOOL hiddenSettingBar;
 
--(instancetype)initWithPDFViewCtrl:(FSPDFViewCtrl*)pdfViewCtrl;
+-(instancetype)initWithPDFViewCtrl:(FSPDFViewCtrl*)pdfViewCtrl options:(NSDictionary*)options;
 -(void)onLayoutModeChanged:(PDF_LAYOUT_MODE)oldLayoutMode newLayoutMode:(PDF_LAYOUT_MODE)newLayoutMode;
 @end

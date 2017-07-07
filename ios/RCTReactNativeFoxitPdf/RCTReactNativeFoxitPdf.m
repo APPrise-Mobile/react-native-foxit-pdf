@@ -68,6 +68,12 @@ static BOOL isFiledEdited = FALSE;
     }
 }
 
++ (void)close {
+    UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
+    UIViewController *rootViewController = keyWindow.rootViewController;
+    [rootViewController dismissViewControllerAnimated:TRUE completion:nil];
+}
+
 + (BOOL)openPDFAtPath:(NSString*)path withPassword:(NSString*)password
 {
     FSPDFDoc* pdfDoc = [FSPDFDoc createFromFilePath:path];
@@ -121,14 +127,13 @@ RCT_EXPORT_METHOD(init:(NSString *)serial
 }
 
 RCT_EXPORT_METHOD(openPdf:(NSString *)path
-                 documentTitle:(NSString *)documentTitle
                  options:(NSDictionary *)options
                  callback:(RCTResponseSenderBlock)callback)
 {
     FSPDFViewCtrl *pdfViewCtrl = [[FSPDFViewCtrl alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     [ReactNativeFoxitPdf setPdfViewCtrl:pdfViewCtrl];
 
-    ReadFrame *readFrame = [[ReadFrame alloc] initWithPdfViewCtrl:pdfViewCtrl];
+    ReadFrame *readFrame = [[ReadFrame alloc] initWithPdfViewCtrl:pdfViewCtrl options:options];
     [ReactNativeFoxitPdf setReadFrame:readFrame];
     [ReactNativeFoxitPdf openPDFAtPath:path withPassword:nil];
 }

@@ -30,5 +30,6 @@
 + (void)setIsFileEdited:(BOOL)newIsFileEdited;
 
 + (BOOL)openPDFAtPath:(NSString*)path withPassword:(NSString*)password;
++ (void)close;
 
 @end

@@ -55,5 +55,5 @@ typedef void (^stampClicked)();
 @property (nonatomic,copy)noteClicked noteClicked;
 @property (nonatomic,copy)stampClicked stampClicked;
 
--(MoreAnnotationsBar*)init:(CGRect)frame;
+-(MoreAnnotationsBar*)init:(CGRect)frame options:(NSDictionary*)options;
 @end

@@ -42,7 +42,7 @@
     FSPDFViewCtrl* __weak _pdfViewCtrl;
     UIExtensionsManager* __weak _extensionsManager;
     ReadFrame* __weak _readFrame;
-    
+
     PDF_LAYOUT_MODE currentPageLayoutMode;
     PDF_LAYOUT_MODE oldPageLayoutMode;
 }
@@ -54,7 +54,7 @@
         _extensionsManager = extensionsManager;
         _pdfViewCtrl = extensionsManager.pdfViewCtrl;
         _readFrame = readFrame;
-        
+
         [self loadModule];
     }
     return self;
@@ -123,11 +123,11 @@
             make.width.mas_equalTo(size.width);
             make.height.mas_equalTo(size.height);
         }];
-        __weak typeof(self) weakSelf = self;
+        __weak ReflowModule* weakSelf = self;
         self.backItem.onTapClick = ^(TbBaseItem *item) {
             [weakSelf cancelButtonClicked];
         };
-        
+
 		self.titleItem = [TbBaseItem createItemWithTitle:NSLocalizedString(@"kReflow", nil)]; // assign to var to keep a strong reference, can't directly assign to weak property of self
 		self.titleItem.textColor = [UIColor colorWithRGBHex:0xff3f3f3f];
 		self.titleItem.enable = NO;
@@ -139,9 +139,9 @@
             make.width.mas_equalTo(size.width);
             make.height.mas_equalTo(size.height);
         }];
-		
+
 		self.viewTopReflow = _topToolbar.contentView;
-		
+
 		[_pdfViewCtrl insertSubview:_viewTopReflow aboveSubview:[_pdfViewCtrl getDisplayView]];
         [self.topToolbar.contentView mas_makeConstraints:^(MASConstraintMaker *make) {
             make.left.mas_equalTo(_viewTopReflow.superview.mas_left);
@@ -170,9 +170,9 @@
 		[self.previousPage setImage:[UIImage imageNamed:@"reflow_preD.png"] forState:UIControlStateDisabled];
 		[self.nextPage setImage:[UIImage imageNamed:@"reflow_next.png"] forState:UIControlStateNormal];
 		[self.nextPage setImage:[UIImage imageNamed:@"reflow_nextD.png"] forState:UIControlStateDisabled];
-		
+
 		self.needShowImageForReflow = YES;
-		
+
 		[_pdfViewCtrl insertSubview:_toolBarBottomReflow aboveSubview:[_pdfViewCtrl getDisplayView]];
         [_toolBarBottomReflow mas_makeConstraints:^(MASConstraintMaker *make) {
             make.left.mas_equalTo(_toolBarBottomReflow.superview.mas_left);
@@ -257,7 +257,7 @@
     {
         self.previousPage.enabled = YES;
     }
-    
+
     if ([_pdfViewCtrl getCurrentPage] >= [_pdfViewCtrl getPageCount] - 1)
     {
         self.nextPage.enabled = NO;
@@ -274,7 +274,7 @@
 {
     _isReflowByClick = NO;
 }
- 
+
 #pragma IGestureEventListener
 
 - (BOOL)onTap:(UITapGestureRecognizer *)recognizer

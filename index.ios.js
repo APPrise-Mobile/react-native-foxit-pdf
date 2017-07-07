@@ -4,10 +4,10 @@ const ReactNativeFoxitPdf = React.NativeModules.ReactNativeFoxitPdf;
 
 export default {
   init: (sn, key, onSuccess, onFailure) => {
-    return ReactNativeFoxitPdf.init(sn, key, onSuccess, onFailure)
+    return ReactNativeFoxitPdf.init(sn, key, () => {})
   },
 
-  openPdf: (uri, title, options) => {
-    return ReactNativeFoxitPdf.openPdf(uri, title, options, () => {});
+  openPdf: (uri, options) => {
+    return ReactNativeFoxitPdf.openPdf(uri, options, () => {});
   }
 };

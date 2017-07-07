@@ -43,7 +43,7 @@
         _pdfViewCtrl = extensionsManager.pdfViewCtrl;
         _readFrame = readFrame;
         [_extensionsManager registerAnnotPropertyListener:self];
-        
+
         [self loadModule];
     }
     return self;
@@ -59,7 +59,7 @@
         [self annotItemClicked];
         _isArrLine = NO;
     };
-    
+
     _readFrame.moreToolsBar.arrowsClicked = ^() {
         _annotType = e_annotLine;
        _isArrLine = YES;
@@ -89,7 +89,7 @@
         [_extensionsManager setCurrentToolHandler:toolHandler];
     }
     [_readFrame.toolSetBar removeAllItems];
-    
+
     TbBaseItem *doneItem = [TbBaseItem createItemWithImage:[UIImage imageNamed:@"annot_done"] imageSelected:[UIImage imageNamed:@"annot_done"] imageDisable:[UIImage imageNamed:@"annot_done"] background:[UIImage imageNamed:@"annotation_toolitembg"]];
     doneItem.tag = 0;
     [_readFrame.toolSetBar addItem:doneItem displayPosition:Position_CENTER];
@@ -115,7 +115,7 @@
             [_extensionsManager showProperty:_annotType rect:item.contentView.bounds inView:item.contentView];
         }
     };
-    
+
     TbBaseItem *continueItem = nil;
     if (_readFrame.continueAddAnnot) {
         continueItem = [TbBaseItem createItemWithImage:[UIImage imageNamed:@"annot_continue"] imageSelected:[UIImage imageNamed:@"annot_continue"] imageDisable:[UIImage imageNamed:@"annot_continue"]background:[UIImage imageNamed:@"annotation_toolitembg"]];
@@ -147,7 +147,7 @@
         [Utility showAnnotationContinue:_readFrame.continueAddAnnot pdfViewCtrl:_extensionsManager.pdfViewCtrl siblingSubview:_readFrame.toolSetBar.contentView];
         [self performSelector:@selector(dismissAnnotationContinue) withObject:nil afterDelay:1];
     };
-    
+
     TbBaseItem *iconItem = [TbBaseItem createItemWithImage:[UIImage imageNamed:@"common_read_more"] imageSelected:[UIImage imageNamed:@"common_read_more"] imageDisable:[UIImage imageNamed:@"common_read_more"]background:[UIImage imageNamed:@"annotation_toolitembg"]];
     iconItem.tag = 4;
     [_readFrame.toolSetBar addItem:iconItem displayPosition:Position_CENTER];
@@ -169,31 +169,31 @@
         make.width.mas_equalTo(self.propertyItem.contentView.bounds.size.width);
         make.height.mas_equalTo(self.propertyItem.contentView.bounds.size.height);
     }];
-    
+
     [continueItem.contentView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.bottom.mas_equalTo(continueItem.contentView.superview.mas_bottom).offset(-5);
         make.left.equalTo(self.propertyItem.contentView.superview.mas_centerX).offset(15);
         make.width.mas_equalTo(continueItem.contentView.bounds.size.width);
         make.height.mas_equalTo(continueItem.contentView.bounds.size.height);
-        
+
     }];
-    
+
     [doneItem.contentView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.bottom.mas_equalTo(doneItem.contentView.superview.mas_bottom).offset(-5);
         make.right.equalTo(self.propertyItem.contentView.mas_left).offset(-30);
         make.width.mas_equalTo(doneItem.contentView.bounds.size.width);
         make.height.mas_equalTo(doneItem.contentView.bounds.size.height);
-        
+
     }];
-    
+
     [iconItem.contentView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.bottom.mas_equalTo(iconItem.contentView.superview.mas_bottom).offset(-5);
         make.left.equalTo(continueItem.contentView.mas_right).offset(30);
         make.width.mas_equalTo(iconItem.contentView.bounds.size.width);
         make.height.mas_equalTo(iconItem.contentView.bounds.size.height);
-        
+
     }];
-    
+
 }
 
 -(void)dismissAnnotationContinue

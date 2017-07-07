@@ -62,13 +62,13 @@
     self.exportFormItem.callBack = self;
     self.exportFormItem.text = NSLocalizedString(@"kExportForm", nil);
     [self.moreMenu addMenuItem:self.group.tag withItem:self.exportFormItem];
-    
+
     self.importFormItem = [[MvMenuItem alloc] init];
     self.importFormItem.tag = TAG_ITEM_IMPORTFORM;
     self.importFormItem.callBack = self;
     self.importFormItem.text = NSLocalizedString(@"kImportForm", nil);
     [self.moreMenu addMenuItem:self.group.tag withItem:self.importFormItem];
-    
+
     self.resetFormItem = [[MvMenuItem alloc] init];
     self.resetFormItem.tag = TAG_ITEM_RESETFORM;
     self.resetFormItem.callBack = self;
@@ -80,22 +80,22 @@
 {
     NSFileManager *filemanager = [NSFileManager defaultManager];
     _readFrame.hiddenMoreMenu = YES;
-    
+
     if (![_pdfViewCtrl.currentDoc hasForm]) {
         AlertView *alertView = [[AlertView alloc] initWithTitle:nil message:@"kNoFormAvailable" buttonClickHandler:nil cancelButtonTitle:@"kOK" otherButtonTitles:nil, nil];
         [alertView show];
         return;
     }
-    
+
     BOOL canFillForm = [Utility canFillFormInDocument:_pdfViewCtrl.currentDoc];
-    
+
     if (item.tag == TAG_ITEM_EXPORTFORM) {
         if (!canFillForm) {
             AlertView *alertView = [[AlertView alloc] initWithTitle:@"kWarning" message:@"kRMSNoAccess" buttonClickHandler:nil cancelButtonTitle:@"kOK" otherButtonTitles:nil, nil];
             [alertView show];
             return;
         }
-        
+
         FileSelectDestinationViewController *selectDestination = [[FileSelectDestinationViewController alloc] init];
         selectDestination.isRootFileDirectory = YES;
         selectDestination.fileOperatingMode = FileListMode_Select;
@@ -103,12 +103,12 @@
         selectDestination.operatingHandler = ^(FileSelectDestinationViewController *controller, NSArray *destinationFolder)
         {
             [controller dismissModalViewControllerAnimated:YES];
-            
+
             __block void(^inputFileName)() = ^() {
                 InputAlertView *inputAlertView = [[InputAlertView alloc] initWithTitle:NSLocalizedString(@"kInputNewFileName", nil) message:nil buttonClickHandler:^(UIView *alertView, int buttonIndex) {
                     InputAlertView *inputAlert = (InputAlertView *)alertView;
                     NSString *fileName = inputAlert.inputTextField.text;
-                    
+
                     if ([fileName rangeOfString:@"/"].location != NSNotFound)
                     {
                         dispatch_async(dispatch_get_main_queue(), ^{
@@ -129,27 +129,27 @@
                         });
                         return;
                     }
-                    
+
                     void(^createXML)(NSString *xmlFilePath) = ^(NSString *xmlFilePath)
                     {
                         NSString *tmpFilePath = [TEMP_PATH stringByAppendingPathComponent:[xmlFilePath lastPathComponent]];
                         FSForm* form = [_pdfViewCtrl.currentDoc getForm];
                         if (nil == form)
                             return;
-                        
+
                         BOOL isSuccess = NO;
                         @try {
                             isSuccess =  [form exportToXML:tmpFilePath];
                         } @catch (NSException *exception) {
                             NSLog(@"ExportToXML EXCEPTION NAME:%@",exception.name);
                         }
-                        
+
                         if (isSuccess)
                         {
                             double delayInSeconds = 0.4;
                             dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
                             dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-                                
+
                                 AlertView *alertView = [[AlertView alloc] initWithTitle:@"" message:@"kExportFormSuccess" buttonClickHandler:nil cancelButtonTitle:nil otherButtonTitles:@"kOK", nil];
                                 [alertView show];
                                 [filemanager moveItemAtPath:tmpFilePath toPath:xmlFilePath error:nil];
@@ -164,9 +164,9 @@
                                 [alertView show];
                             });
                         }
-                        
+
                     };
-                    
+
                     NSString *xmlFilePath = [destinationFolder[0] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.xml",fileName]];
                     NSFileManager *fileManager = [[NSFileManager alloc] init];
                     if ([fileManager fileExistsAtPath:xmlFilePath])
@@ -201,10 +201,10 @@
                 inputAlertView.usesMessageTextView = NO;
                 [inputAlertView show];
             };
-            
+
             inputFileName();
         };
-        __weak typeof(selectDestination) weakSelect = selectDestination;
+        __weak FileSelectDestinationViewController* weakSelect = selectDestination;
         selectDestination.cancelHandler=^
         {
             [weakSelect dismissModalViewControllerAnimated:YES];
@@ -221,14 +221,14 @@
             [alertView show];
             return;
         }
-        
+
         FileSelectDestinationViewController *selectDestination = [[FileSelectDestinationViewController alloc] init];
         selectDestination.isRootFileDirectory = YES;
         selectDestination.fileOperatingMode = FileListMode_Import;
         selectDestination.expectFileType = [NSArray arrayWithObject:@"xml"];
         [selectDestination loadFilesWithPath:DOCUMENT_PATH];
-        
-        
+
+
         selectDestination.operatingHandler=^(FileSelectDestinationViewController *controller, NSArray *destinationFolder)
         {
             [controller dismissModalViewControllerAnimated:YES];
@@ -263,7 +263,7 @@
                 }
             }
         };
-        __weak typeof(selectDestination) weakSelect = selectDestination;
+        __weak FileSelectDestinationViewController* weakSelect = selectDestination;
         selectDestination.cancelHandler=^()
         {
             [weakSelect dismissModalViewControllerAnimated:YES];
@@ -272,7 +272,7 @@
         UIViewController *rootViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
         [rootViewController presentViewController:selectDestinationNavController
                                                                          animated:YES completion:nil];
-                        
+
     }
     else if (item.tag == TAG_ITEM_RESETFORM)
     {
@@ -281,7 +281,7 @@
             [alertView show];
             return;
         }
-        
+
         AlertView *alertView = [[AlertView alloc] initWithTitle:@"kConfirm" message:@"kSureToResetFormFields" buttonClickHandler:^(UIView *alertView, int buttonIndex) {
             if (buttonIndex == 1) {
                 FSForm* form = [_pdfViewCtrl.currentDoc getForm];

@@ -43,7 +43,7 @@
 {
     self.undoItem = [TbBaseItem createItemWithImage:[UIImage imageNamed:@"annot_undo"] imageSelected:[UIImage imageNamed:@"annot_undo"] imageDisable:[UIImage imageNamed:@"annot_undo"]background:[UIImage imageNamed:@"annotation_toolitembg"]];
     self.undoItem.tag = 3;
-    __weak typeof(_extensionsManager) weakExtMgr = _extensionsManager;
+    __weak UIExtensionsManager* weakExtMgr = _extensionsManager;
     self.undoItem.onTapClick = ^(TbBaseItem* item)
     {
         if (weakExtMgr.currentAnnot) {
@@ -53,9 +53,9 @@
             [weakExtMgr undo];
         }
     };
-    
+
     [_readFrame.editDoneBar addItem:self.undoItem displayPosition:Position_LT];
-    
+
     self.redoItem = [TbBaseItem createItemWithImage:[UIImage imageNamed:@"annot_redo"] imageSelected:[UIImage imageNamed:@"annot_redo"] imageDisable:[UIImage imageNamed:@"annot_redo"] background:[UIImage imageNamed:@"annotation_toolitembg"]];
     self.redoItem.tag = 4;
     self.redoItem.onTapClick = ^(TbBaseItem* item)
@@ -67,18 +67,18 @@
             [weakExtMgr redo];
         }
     };
-    
+
     [_readFrame.editDoneBar addItem:self.redoItem displayPosition:Position_LT];
 
     CGRect undoFrame = self.undoItem.contentView.frame;
     CGRect redoFrame =self.redoItem.contentView.frame;
-    
+
     undoFrame.origin.y -= 2;
     redoFrame.origin.y -= 2;
-    
+
     self.undoItem.contentView.frame = undoFrame;
     self.redoItem.contentView.frame = redoFrame;
-    
+
     self.undoItem.enable = NO;
     self.redoItem.enable = NO;
 }
@@ -95,7 +95,7 @@
     {
         self.undoItem.enable = NO;
     }
-    
+
     if ([_extensionsManager canRedo])
     {
         self.redoItem.enable = YES;
@@ -107,4 +107,3 @@
 }
 
 @end
-

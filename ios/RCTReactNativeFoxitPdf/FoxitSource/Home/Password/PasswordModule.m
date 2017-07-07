@@ -76,11 +76,11 @@ typedef void (^PasswordCallBack) (BOOL isInputed, NSString* password);
         _pdfViewCtrl = extensionsManager.pdfViewCtrl;
         _extensionsManager = extensionsManager;
         _readFrame = readFrame;
-        
+
         self.passwordCallback = nil;
         self.inputPassword = nil;
         self.passwordType = e_pwdInvalid;
-        
+
         MenuGroup* group = [_readFrame.more getGroup:TAG_GROUP_PROTECT];
         if (!group) {
             group = [[MenuGroup alloc] init];
@@ -93,7 +93,7 @@ typedef void (^PasswordCallBack) (BOOL isInputed, NSString* password);
         pwdItem.text = NSLocalizedString(@"kEncryption", nil);
         pwdItem.callBack = self;
         [_readFrame.more addMenuItem:TAG_GROUP_PROTECT withItem:pwdItem];
-        
+
         [_pdfViewCtrl registerDocEventListener:self];
     }
     return self;
@@ -105,10 +105,10 @@ typedef void (^PasswordCallBack) (BOOL isInputed, NSString* password);
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     self.currentAlertView = nil;
-    
+
     BOOL isCancelled = (buttonIndex == 0);
     self.inputPassword = isCancelled ? nil : alertView.inputTextField.text;
-    
+
     if (self.passwordCallback) {
         self.passwordCallback(!isCancelled, self.inputPassword);
     }
@@ -129,7 +129,7 @@ typedef void (^PasswordCallBack) (BOOL isInputed, NSString* password);
 - (void)tryLoadPDFDocument:(FSPDFDoc*)document guessPassword:(NSString*)guessPassword success:(void(^)(NSString* password))success error:(void(^)(NSString* description))error abort:(void(^)())abort
 {
     self.pdfDoc = document;
-    __weak typeof(self) weakSelf = self;
+    __weak PasswordModule* weakSelf = self;
     enum FS_ERRORCODE status = [document load:guessPassword];
     if(status == e_errSuccess) {
         if (success) {
@@ -222,10 +222,10 @@ typedef void (^PasswordCallBack) (BOOL isInputed, NSString* password);
     NSString *filePath = [ReactNativeFoxitPdf getFilePath];
     NSString* originalPDFPath = filePath;
     NSString* encryptedPDFPath = nil;
-    
+
     NSFileManager* fileManager = [NSFileManager defaultManager];
     BOOL isOK = NO;
-    
+
     @autoreleasepool {
         FSStdSecurityHandler* stdSecurityHandler = [FSStdSecurityHandler create];
         int userPermissions = [self permissionsFromInfo];
@@ -233,11 +233,11 @@ typedef void (^PasswordCallBack) (BOOL isInputed, NSString* password);
         if (isOK) {
             isOK = [doc setSecurityHandler:stdSecurityHandler];
         }
-    
+
         if (isOK) {
             NSString* fileName = [originalPDFPath lastPathComponent];
             encryptedPDFPath = [NSTemporaryDirectory() stringByAppendingString:[NSString stringWithFormat:@"_encryped_%@", fileName]];
-            
+
             if ([fileManager fileExistsAtPath:encryptedPDFPath]) {
                 [fileManager removeItemAtPath:encryptedPDFPath error:nil];
             }
@@ -267,7 +267,7 @@ typedef void (^PasswordCallBack) (BOOL isInputed, NSString* password);
     BOOL isOK = NO;
     NSString* decryptedPDFPath = nil;
     NSFileManager* fileManager = [NSFileManager defaultManager];
-    
+
     @autoreleasepool {
         NSString *filePath = [ReactNativeFoxitPdf getFilePath];
         isOK = [pdfDoc removeSecurity];
@@ -281,7 +281,7 @@ typedef void (^PasswordCallBack) (BOOL isInputed, NSString* password);
         }
         if (isOK) {
             isOK = [fileManager removeItemAtPath:filePath error:nil];
-            
+
             if (isOK) {
                 isOK = [fileManager moveItemAtPath:decryptedPDFPath toPath:filePath error:nil];
             }
@@ -294,7 +294,7 @@ typedef void (^PasswordCallBack) (BOOL isInputed, NSString* password);
             }
         }
     }
-    
+
     return isOK;
 }
 
@@ -304,7 +304,7 @@ typedef void (^PasswordCallBack) (BOOL isInputed, NSString* password);
 {
     if (error != e_errSuccess) return;
     self.pdfDoc = document;
-    
+
     [self updatePasswordType];
 
     NSString* text = NSLocalizedString(@"kEncryption", nil);
@@ -348,17 +348,17 @@ typedef void (^PasswordCallBack) (BOOL isInputed, NSString* password);
 {
     EncryptOptionViewController* encryptOptionCtrl = [[EncryptOptionViewController alloc] initWithNibName:@"EncryptOptionViewController" bundle:nil];
     self.currentVC = encryptOptionCtrl;
-    
+
     encryptOptionCtrl.optionHandler = ^(EncryptOptionViewController *ctrl, BOOL isCancel, NSString* openPassword, NSString* ownerPassword, BOOL print, BOOL printHigh, BOOL fillForm, BOOL addAnnot, BOOL assemble, BOOL modify, BOOL copyForAccess, BOOL copy)
     {
         if (isCancel) return;
         if (openPassword == nil && ownerPassword == nil) {
             return;
         }
-        
+
         self.securityInfo = [[PasswordSecurityInfo alloc] initWithOpenPassword:openPassword ownerPassword:ownerPassword print:print printHigh:printHigh fillForm:fillForm addAnnot:addAnnot assemble:assemble modify:modify copyForAccess:copyForAccess copy:copy];
-        
-        __weak typeof(self) weakSelf = self;
+
+        __weak PasswordModule* weakSelf = self;
         if ([self.pdfDoc isModified]) { // whether to save before encryption?
             AlertView *alertView = [[AlertView alloc] initWithTitle:@"kConfirm" message:@"Do you want to save document before encryption?" buttonClickHandler:^(UIView *alertView, int buttonIndex) {
                 BOOL shouldSaveChanges = (buttonIndex == 1);
@@ -381,7 +381,7 @@ typedef void (^PasswordCallBack) (BOOL isInputed, NSString* password);
             [self encryptDocument:openPassword ownerPassword:ownerPassword print:print printHigh:printHigh fillForm:fillForm addAnnot:addAnnot modify:modify assemble:assemble copyForAccess:copyForAccess copy:copy];
         }
     };
-    
+
     // show permission setting option
     dispatch_async(dispatch_get_main_queue(), ^{
         UINavigationController* encryptOptionNavCtrl = [[UINavigationController alloc] initWithRootViewController:encryptOptionCtrl];
@@ -400,7 +400,7 @@ typedef void (^PasswordCallBack) (BOOL isInputed, NSString* password);
 {
     [_extensionsManager exitFormFilling];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        
+
         BOOL isOK = [self encryptDocument:self.pdfDoc];
         dispatch_async(dispatch_get_main_queue(), ^{
             if (!isOK) {
@@ -417,11 +417,11 @@ typedef void (^PasswordCallBack) (BOOL isInputed, NSString* password);
             } else {
                 [self updatePasswordType];
                 [self updateItemText:NSLocalizedString(@"kDecryption", nil)];
-                
+
                 AlertView *alertView = [[AlertView alloc] initWithTitle:@"kSuccess" message:@"kEncryptAddSuccess" buttonClickHandler:nil cancelButtonTitle:@"kOK" otherButtonTitles:nil];
                 self.currentVC = alertView;
                 [alertView show];
-                
+
                 // if this file is encrypted by open doc password,
                 // clear thumbnail cache. other cache is remained as user can still open it and see.
                 if (openPassword != nil) {
@@ -436,7 +436,7 @@ typedef void (^PasswordCallBack) (BOOL isInputed, NSString* password);
     if (![self isEncrypted]) {
         return;
     }
-    __weak typeof(self) weakSelf = self;
+    __weak PasswordModule* weakSelf = self;
     typedef void (^SuccessCallback) ();
     __block void (^promptForOwnerPassword) (NSString* title, SuccessCallback success) = ^(NSString* title, SuccessCallback success) {
         [weakSelf promptForPasswordWithTitle:title callback:^(BOOL isInputed, NSString* password) {
@@ -499,7 +499,7 @@ typedef void (^PasswordCallBack) (BOOL isInputed, NSString* password);
 {
     [_extensionsManager exitFormFilling];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        
+
         BOOL isOK = [self removeEncrypt:self.pdfDoc];
         dispatch_async(dispatch_get_main_queue(), ^{
             if (!isOK) {
@@ -514,7 +514,7 @@ typedef void (^PasswordCallBack) (BOOL isInputed, NSString* password);
                 [alertView show];
             } else {
                 [self updateItemText: NSLocalizedString(@"kEncryption", nil)];
-                
+
                 AlertView *alertView = [[AlertView alloc] initWithTitle:@"kSuccess" message:@"kEncryptRemoveSuccess" buttonClickHandler:nil cancelButtonTitle:@"kOK" otherButtonTitles:nil];
                 self.currentVC = alertView;
                 [alertView show];

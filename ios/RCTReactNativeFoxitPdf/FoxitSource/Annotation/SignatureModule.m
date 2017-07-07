@@ -63,12 +63,12 @@
     UIView *superView = _pdfViewCtrl;
     _topToolBar = [[UIView alloc] init];
     _topToolBar.backgroundColor = [UIColor colorWithRGBHex:0xF2FAFAFA];
-    
+
     _cancelBtn = [[UIButton alloc] init];
     [_cancelBtn setImage:[UIImage imageNamed:@"common_back_black"] forState:UIControlStateNormal];
     [_cancelBtn addTarget:self action:@selector(cancelSignature) forControlEvents:UIControlEventTouchUpInside];
     [_topToolBar addSubview:_cancelBtn];
-    
+
     TbBaseItem *titleItem = [TbBaseItem createItemWithTitle:NSLocalizedString(@"kSignatureTitle", nil)];
     titleItem.textColor = [UIColor colorWithRGBHex:0x3F3F3F];
     [_topToolBar addSubview:titleItem.contentView];
@@ -79,7 +79,7 @@
         make.width.mas_equalTo(size.width);
         make.height.mas_equalTo(size.height);
     }];
-    
+
     UIView *divideView = [[UIView alloc] init];
     divideView.backgroundColor = [UIColor colorWithRed:0xE2/255.0f green:0xE2/255.0f blue:0xE2/255.0f alpha:1];
     [_topToolBar addSubview:divideView];
@@ -89,28 +89,28 @@
         make.bottom.mas_equalTo(divideView.superview.mas_bottom);
         make.right.mas_equalTo(divideView.superview.mas_right);
     }];
-    
+
     _bottomToolBar = [[UIView alloc] init];
     _bottomToolBar.backgroundColor = [UIColor colorWithRGBHex:0xF2FAFAFA];
     _listItem = [TbBaseItem createItemWithImageAndTitle:NSLocalizedString(@"ksignListIconTitle", nil) imageNormal:[UIImage imageNamed:@"sign_list"] imageSelected:[UIImage imageNamed:@"sign_list"] imageDisable:[UIImage imageNamed:@"sign_list"] background:nil imageTextRelation:RELATION_BOTTOM];
     _listItem.textColor = [UIColor blackColor];
     _listItem.textFont = [UIFont systemFontOfSize:12.f];
-    
-    __weak typeof(self) weakSelf = self;
+
+    __weak SignatureModule* weakSelf = self;
     _listItem.onTapClick =  ^(TbBaseItem* item)
     {
         [weakSelf.toolHandler delete];
         [weakSelf.toolHandler signList];
     };
-    
+
     [_bottomToolBar addSubview:_listItem.contentView];
-    
+
     [_cancelBtn mas_makeConstraints:^(MASConstraintMaker *make) {
         make.width.mas_equalTo(26);
         make.left.mas_equalTo(_cancelBtn.superview.mas_left).offset(10);
         make.centerY.mas_equalTo(_cancelBtn.superview.mas_centerY).offset(10);
     }];
-    
+
     float width = _listItem.contentView.frame.size.width;
     float height = _listItem.contentView.frame.size.height;
     [_listItem.contentView mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -119,7 +119,7 @@
         make.centerY.mas_equalTo(_listItem.contentView.superview.mas_centerY);
         make.centerX.mas_equalTo(_listItem.contentView.superview.mas_centerX).offset(0);
     }];
-    
+
     UIView *divideView1 = [[UIView alloc] init];
     divideView1.backgroundColor = [UIColor colorWithRed:0xE2/255.0f green:0xE2/255.0f blue:0xE2/255.0f alpha:1];
     [_bottomToolBar addSubview:divideView1];
@@ -129,19 +129,19 @@
         make.top.mas_equalTo(divideView1.superview.mas_top);
         make.right.mas_equalTo(divideView1.superview.mas_right);
     }];
-    
+
     _topToolBar.hidden = YES;
     _bottomToolBar.hidden = YES;
     [superView addSubview:_topToolBar];
     [superView addSubview:_bottomToolBar];
-    
+
     [_topToolBar mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.mas_equalTo(_topToolBar.superview.mas_top).offset(-64);
         make.left.mas_equalTo(_topToolBar.superview.mas_left);
         make.right.mas_equalTo(_topToolBar.superview.mas_right);
         make.height.mas_equalTo(64);
     }];
-    
+
     [_bottomToolBar mas_makeConstraints:^(MASConstraintMaker *make) {
         make.bottom.mas_equalTo(_bottomToolBar.superview.mas_bottom).offset(49);
         make.left.mas_equalTo(_bottomToolBar.superview.mas_left);
@@ -159,7 +159,7 @@
 
 - (void)setToolBarHiden:(BOOL)toolBarHiden
 {
-    
+
     if (toolBarHiden)
     {
         CGRect topToolbarFrame = _topToolBar.frame;
@@ -175,7 +175,7 @@
                 make.right.mas_equalTo(_topToolBar.superview.mas_right);
                 make.height.mas_equalTo(64);
             }];
-            
+
             [_bottomToolBar mas_remakeConstraints:^(MASConstraintMaker *make) {
                 make.bottom.mas_equalTo(_bottomToolBar.superview.mas_bottom).offset(49);
                 make.left.mas_equalTo(_bottomToolBar.superview.mas_left);
@@ -203,7 +203,7 @@
                 make.right.mas_equalTo(_topToolBar.superview.mas_right);
                 make.height.mas_equalTo(64);
             }];
-            
+
             [_bottomToolBar mas_remakeConstraints:^(MASConstraintMaker *make) {
                 make.bottom.mas_equalTo(_bottomToolBar.superview.mas_bottom);
                 make.left.mas_equalTo(_bottomToolBar.superview.mas_left);

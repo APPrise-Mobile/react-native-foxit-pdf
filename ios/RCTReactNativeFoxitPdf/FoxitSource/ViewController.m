@@ -22,10 +22,10 @@
     self.navController = [[UINavigationController alloc] init];
     self.navController.navigationBarHidden = YES;
     self.navController.view.frame = [[UIScreen mainScreen] bounds];
-    
+
     self.view.backgroundColor = [UIColor whiteColor];
     self.view.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin |UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-    
+
     UIViewController* fileListViewController = [[UIViewController alloc] init];
     self.docModule = [[DocumentModule alloc] init];
     [fileListViewController.view addSubview:[self.docModule getTopToolbar]];

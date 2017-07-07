@@ -77,6 +77,6 @@ typedef void (^nightmodel)(BOOL selected);
 @property (nonatomic, strong) UIButton *screenLockBtn_ipad;
 @property (nonatomic, strong) UIButton *screenLockBtn;
 
-- (instancetype)initWithPDFViewCtrl:(FSPDFViewCtrl*)pdfViewCtrl moreSettingBarController:(SettingBarController*)moreSettingBarController;
+- (instancetype)initWithPDFViewCtrl:(FSPDFViewCtrl*)pdfViewCtrl moreSettingBarController:(SettingBarController*)moreSettingBarController options:(NSDictionary*)options;
 - (void)setItemState:(BOOL)state value:(float)value itemType:(SettingItemType)itemType;
 @end

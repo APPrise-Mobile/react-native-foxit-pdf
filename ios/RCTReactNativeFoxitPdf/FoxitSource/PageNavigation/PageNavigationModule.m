@@ -59,17 +59,17 @@
 	self.totalNumLabel = [[UILabel alloc] init];
 	self.totalNumLabel.userInteractionEnabled = YES;
 	[self.totalNumLabel addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showGotoPageToolbar:)]];
-	
+
 	self.prevImage = [[UIImageView alloc] init];
 	self.prevImage.image = [UIImage imageNamed:@"goto_page_jump_prev"];
 	self.prevImage.userInteractionEnabled = YES;
 	[self.prevImage addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleGotoPrevView:)]];
-	
+
 	self.nextImage = [[UIImageView alloc] init];
 	self.nextImage.image = [UIImage imageNamed:@"goto_page_jump_next"];
 	self.nextImage.userInteractionEnabled = YES;
 	[self.nextImage addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleGotoNextView:)]];
-	
+
 	self.pageNumView = [[UIView alloc] init];
 	[self.pageNumView addSubview:self.totalNumLabel];
 	[self.pageNumView addSubview:self.prevImage];
@@ -79,10 +79,10 @@
 - (void)addPageNumberView
 {
 	CGRect frame = [UIScreen mainScreen].bounds;
-	
+
 	self.prevImage.hidden = YES;
 	self.nextImage.hidden = YES;
-	
+
 	if (DEVICE_iPHONE) {
 		self.pageNumView.frame = CGRectMake(15, frame.size.height - 93, 50, 34);
 		self.pageNumView.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.425];
@@ -115,7 +115,7 @@
     } else {
         ret = [NSString stringWithFormat:@"%d", pageIndex + 1];
     }
-    
+
     if (needTotal) {
         ret = [NSString stringWithFormat:@"%@/%d", ret, pageCount];
     }
@@ -131,7 +131,7 @@
 		_gotoPageToolbar.backgroundColor = [UIColor colorWithRGBHex:0xF2FAFAFA];
 		_gotoPageToolbar.hidden = YES;
 		_gotoPageToolbar.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleWidth;
-		
+
 		self.goBtn = [[UIButton alloc] init];
 		self.goBtn.titleLabel.font = [UIFont systemFontOfSize:15];
 		self.goBtn.titleLabel.textAlignment = NSTextAlignmentCenter;
@@ -140,7 +140,7 @@
 		[self.goBtn setTitleColor:[UIColor colorWithRGBHex:0xF2FAFAFA] forState:UIControlStateHighlighted | UIControlStateDisabled | UIControlStateSelected | UIControlStateApplication | UIControlStateReserved];
 		self.goBtn.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleWidth;
 		[self.goBtn addTarget:self action:@selector(goAction) forControlEvents:UIControlEventTouchUpInside];
-        
+
 		self.pageNumBar = [[UITextField alloc] initWithFrame:CGRectMake(10, 8, (int)self.goBtn.frame.origin.x - 20, 30)];
 		self.pageNumBar.keyboardType = UIKeyboardTypeNumberPad;
 		self.pageNumBar.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleWidth;
@@ -148,10 +148,10 @@
 		self.pageNumBar.layer.borderColor = [UIColor colorWithRGBHex:0x179cdb].CGColor;
 		self.pageNumBar.layer.borderWidth= 1.0f;
 		self.pageNumBar.layer.cornerRadius=4.0f;
-		
+
 		[_gotoPageToolbar addSubview:self.goBtn];
 		[_gotoPageToolbar addSubview:self.pageNumBar];
-        
+
         UIView *divideView = [[UIView alloc] init];
         divideView.backgroundColor = [UIColor colorWithRGBHex:0x949494];
         divideView.frame = CGRectMake(0, 44 -  [Utility realPX:1.0f], SCREENWIDTH, [Utility realPX:1.0f]);
@@ -234,17 +234,17 @@
 - (void)showGotoPageToolbar:(UITapGestureRecognizer *)recognizer
 {
     [_extensionsManager setCurrentAnnot:nil];
-    
+
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(keyboardWillShow:)
 												 name:UIKeyboardWillShowNotification
 											   object:nil];
-	
+
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(keyboardWillHide:)
 												 name:UIKeyboardWillHideNotification
 											   object:nil];
-	
+
 	[_pdfViewCtrl addSubview:self.gotoPageToolbar];
 	[self.pageNumBar becomeFirstResponder];
 	self.gotoPageToolbar.hidden = NO;
@@ -256,7 +256,7 @@
 - (void)handleGotoPrevView:(UITapGestureRecognizer *)recognizer
 {
     [_extensionsManager setCurrentAnnot:nil];
-    
+
 	if ([_pdfViewCtrl hasPrevView]) {
         [_pdfViewCtrl gotoPrevView:YES];
 	}
@@ -265,7 +265,7 @@
 - (void)handleGotoNextView:(UITapGestureRecognizer *)recognizer
 {
     [_extensionsManager setCurrentAnnot:nil];
-    
+
 	if ([_pdfViewCtrl hasNextView]) {
         [_pdfViewCtrl gotoNextView:YES];
 	}
@@ -276,7 +276,7 @@
     self.pageNumView.hidden = NO;
     _totalNumLabel.text = [self getDisplayPageLabel:[_pdfViewCtrl getCurrentPage] needTotal:YES];
     _totalNumLabel.font = [UIFont systemFontOfSize:15];
-    
+
     CGSize sizeName = [self.totalNumLabel.text sizeWithFont:self.totalNumLabel.font
                                           constrainedToSize:CGSizeMake(MAXFLOAT, 0.0)
                                               lineBreakMode:NSLineBreakByWordWrapping];
@@ -285,9 +285,9 @@
     } else {
         self.totalNumLabel.frame = CGRectMake(0, (30 - sizeName.height)/2, sizeName.width, sizeName.height);
     }
-    
+
     CGRect viewFrame = self.pageNumView.frame;
-    
+
     if ([_pdfViewCtrl hasPrevView] && ![_pdfViewCtrl hasNextView]) {
         viewFrame.size.width = 46 + self.totalNumLabel.frame.size.width;
         self.pageNumView.frame = viewFrame;
@@ -330,7 +330,7 @@
     [_pdfViewCtrl registerGestureEventListener:self];
 	[_pdfViewCtrl registerPageEventListener:self];
 	[_pdfViewCtrl registerDocEventListener:self];
-    
+
 	[_readFrame registerFullScreenListener:self];
     [_readFrame registerStateChangeListener:self];
     [_readFrame registerRotateChangedListener:self];
@@ -358,7 +358,7 @@
 		self.nextImage.frame = CGRectMake(20 + self.totalNumLabel.frame.size.width, 9, 16, 16);
 		self.nextImage.hidden = NO;
 		self.prevImage.hidden = YES;
-		
+
 	} else if ([_pdfViewCtrl hasPrevView] && [_pdfViewCtrl hasNextView]) {
 		viewFrame.size.width = 72 + self.totalNumLabel.frame.size.width;
 		self.pageNumView.frame = viewFrame;
@@ -419,7 +419,7 @@
 
 -(void)onDocWillSave:(FSPDFDoc*)document
 {
-    
+
 }
 
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration{

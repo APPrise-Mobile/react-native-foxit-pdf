@@ -51,6 +51,7 @@
 @property (nonatomic, assign) BOOL isPopoverhidden;
 @property (nonatomic, copy) AnnotAuthorCallBack callBack;
 @property (nonatomic, assign)int currentState;
+@property (nonatomic, strong) NSDictionary* options;
 
 @property (nonatomic, strong) DXPopover *popover;
 
@@ -68,7 +69,7 @@ static ReadFrame* _instance = nil;
     return _instance;
 }
 
--(id)initWithPdfViewCtrl:(FSPDFViewCtrl *)pdfViewCtrl
+-(id)initWithPdfViewCtrl:(FSPDFViewCtrl *)pdfViewCtrl options:(NSDictionary*)options
 {
     if (self = [super init])
     {
@@ -78,15 +79,18 @@ static ReadFrame* _instance = nil;
         self.stateChangeListeners = [NSMutableArray array];
         self.currentState = STATE_NORMAL;
         self.pdfViewCtrl = pdfViewCtrl;
+        self.options = options;
+        self.isReadOnly = [[options valueForKey:@"isReadOnly"] boolValue];
         [pdfViewCtrl registerDocEventListener:self];
         [pdfViewCtrl registerLayoutChangedEventListener:self];
-        
+
         [self buildToolbars];
         [self buildItems];
-        
+
         _extensionsMgr = [[UIExtensionsManager alloc] initWithPDFViewControl:pdfViewCtrl];
+
         pdfViewCtrl.extensionsManager = _extensionsMgr;
-        
+
         SignToolHandler* signToolHandler = (SignToolHandler*)[_extensionsMgr getToolHandlerByName:Tool_Signature];
         signToolHandler.docChanging = ^(NSString* newDocPath){
             NSString *password = [ReactNativeFoxitPdf getPassword];
@@ -95,7 +99,7 @@ static ReadFrame* _instance = nil;
         signToolHandler.getDocPath = ^NSString*() {
             return [ReactNativeFoxitPdf getFilePath];
         };
-        
+
         [_extensionsMgr registerToolEventListener:self];
         [_extensionsMgr registerAnnotEventListener:self];
         [_extensionsMgr registerSearchEventListener:self];
@@ -104,32 +108,49 @@ static ReadFrame* _instance = nil;
         [pdfViewCtrl registerPageEventListener:self];
         [self registerStateChangeListener:self];
         [self registerRotateChangedListener:_extensionsMgr];
-        
+
         self.panelController = [[PanelController alloc] initWithUIExtensionsManager:_extensionsMgr];
         self.panelController.isHidden = YES;
-        
+
         NSMutableArray* modules = [NSMutableArray array];
         [modules addObject:[[PageNavigationModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
-        [modules addObject:[[MarkupModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
-        [modules addObject:[[NoteModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
-        [modules addObject:[[UndoModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
-        [modules addObject:[[MoreModule alloc] initWithViewCtrl:self.pdfViewCtrl readFrame:self]];
-        [modules addObject:[[FormModule alloc] initWithViewCtrl:self.pdfViewCtrl readFrame:self]];
-        [modules addObject:[[ShapeModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
-        [modules addObject:[[FreetextModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
-        [modules addObject:[[PencilModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
-        [modules addObject:[[EraseModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
-        [modules addObject:[[LineModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
-        [modules addObject:[[StampModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
-        [modules addObject:[[ReplaceModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
-        [modules addObject:[[InsertModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
-        [modules addObject:[[AttachmentModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
+        BOOL isMoreEnabled = [[options valueForKey:@"isMoreEnabled"] boolValue];
+        if (isMoreEnabled) {
+          [modules addObject:[[MoreModule alloc] initWithViewCtrl:self.pdfViewCtrl readFrame:self]];
+        }
         [modules addObject:[[ReflowModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
-        [modules addObject:[[SignatureModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
+        if(!self.isReadOnly) {
+            [modules addObject:[[MarkupModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
+            BOOL isCommentEnabled = [[options valueForKey:@"isCommentEnabled"] boolValue];
+            if (isCommentEnabled) {
+              [modules addObject:[[NoteModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
+            }
+            [modules addObject:[[UndoModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
+            [modules addObject:[[FormModule alloc] initWithViewCtrl:self.pdfViewCtrl readFrame:self]];
+            [modules addObject:[[ShapeModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
+            [modules addObject:[[FreetextModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
+            [modules addObject:[[PencilModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
+            [modules addObject:[[EraseModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
+            [modules addObject:[[LineModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
+            BOOL isStampEnabled = [[options valueForKey:@"isStampEnabled"] boolValue];
+            if (isStampEnabled) {
+              [modules addObject:[[StampModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
+            }
+            [modules addObject:[[ReplaceModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
+            [modules addObject:[[InsertModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
+            BOOL isAttachmentEnabled = [[options valueForKey:@"isAttachmentEnabled"] boolValue];
+            if (isAttachmentEnabled) {
+              [modules addObject:[[AttachmentModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
+            }
+            BOOL isSignaureEnabled = [[options valueForKey:@"isSignaureEnabled"] boolValue];
+            if (isSignaureEnabled) {
+              [modules addObject:[[SignatureModule alloc] initWithUIExtensionsManager:_extensionsMgr readFrame:self]];
+            }
+        }
         self.passwordModule = [[PasswordModule alloc] initWithExtensionsManager:_extensionsMgr readFrame:self];
         [modules addObject:self.passwordModule];
         self.modules = modules;
-        
+
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateBookmarkButtonState) name:UPDATEBOOKMARK object:nil];
     }
     _instance = self;
@@ -142,14 +163,14 @@ static ReadFrame* _instance = nil;
     if (!OS_ISVERSION8 && UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
         screenFrame = CGRectMake(0, 0, screenFrame.size.height, screenFrame.size.width);
     }
-    
+
     maskView = [[UIControl alloc] initWithFrame:[UIScreen mainScreen].bounds];
     maskView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleHeight;
 
     self.topToolbar = [[TbBaseBar alloc] init];
     self.topToolbar.contentView.frame = CGRectMake(0, 0, screenFrame.size.width, 64);
     self.topToolbar.contentView.backgroundColor = [UIColor colorWithRGBHex:0xF2FAFAFA];
-    
+
     self.bottomToolbar = [[TbBaseBar alloc] init];
     self.bottomToolbar.top = NO;
     self.bottomToolbar.contentView.frame = CGRectMake(0, screenFrame.size.height-49, screenFrame.size.width, 49);
@@ -158,12 +179,12 @@ static ReadFrame* _instance = nil;
     if (DEVICE_iPHONE) {
         self.bottomToolbar.intervalWidth = 40.f;
     }
-    
+
     self.editDoneBar = [[TbBaseBar alloc] init];
     self.editDoneBar.contentView.frame = CGRectMake(0, 0, 200, 64);
     self.editDoneBar.top = YES;
     self.editDoneBar.hasDivide = NO;
-    
+
     self.editBar = [[TbBaseBar alloc] init];
     self.editBar.top = NO;
     self.editBar.hasDivide = NO;
@@ -175,7 +196,7 @@ static ReadFrame* _instance = nil;
         self.editBar.intervalWidth = 30;
     }
     self.editBar.contentView.frame = CGRectMake(0, screenFrame.size.height-49, screenFrame.size.width, 49);
-    
+
     self.toolSetBar = [[TbBaseBar alloc] init];
     self.toolSetBar.contentView.frame = CGRectMake(0, screenFrame.size.height - 49, screenFrame.size.width,49);
     self.toolSetBar.hasDivide = NO;
@@ -187,16 +208,16 @@ static ReadFrame* _instance = nil;
     {
         self.toolSetBar.intervalWidth = 30;
     }
-    
+
     self.more = [[MenuView alloc] init];
     [self.more getContentView].frame = CGRectMake([UIScreen mainScreen].bounds.size.width-300, 0, 300,[UIScreen mainScreen].bounds.size.height);
     [self.more setMenuTitle:NSLocalizedString(@"kMore", nil)];
-    
-    self.moreToolsBar = [[MoreAnnotationsBar alloc] init:DEVICE_iPHONE ? CGRectMake(0, screenFrame.size.height-250, screenFrame.size.width, 250) : CGRectMake(0, 0, 300, 250)];
-    
+
+    self.moreToolsBar = [[MoreAnnotationsBar alloc] init:DEVICE_iPHONE ? CGRectMake(0, screenFrame.size.height-250, screenFrame.size.width, 250) : CGRectMake(0, 0, 300, 250) options:self.options];
+
     [self.pdfViewCtrl addSubview:self.topToolbar.contentView];
     [self.pdfViewCtrl addSubview:self.bottomToolbar.contentView];
-    
+
     [self.pdfViewCtrl addSubview:self.editDoneBar.contentView];
     [self.pdfViewCtrl addSubview:self.editBar.contentView];
     [self.pdfViewCtrl addSubview:self.toolSetBar.contentView];
@@ -204,7 +225,7 @@ static ReadFrame* _instance = nil;
     if (DEVICE_iPHONE) {
         [self.pdfViewCtrl addSubview:self.moreToolsBar.contentView];
     }
-    self.settingBarController = [[SettingBarController alloc] initWithPDFViewCtrl:self.pdfViewCtrl];
+    self.settingBarController = [[SettingBarController alloc] initWithPDFViewCtrl:self.pdfViewCtrl options:self.options];
 
     self.hiddenEditDoneBar = YES;
     self.hiddenEditBar = YES;
@@ -217,8 +238,8 @@ static ReadFrame* _instance = nil;
 
 -(void)buildItems
 {
-    __weak typeof(self) weakSelf = self;
-    
+    __weak ReadFrame* weakSelf = self;
+
     UIImage *commonBackBlack = [UIImage imageNamed:@"common_back_black"];
     self.backItem = [TbBaseItem createItemWithImage:commonBackBlack imageSelected:commonBackBlack imageDisable:commonBackBlack];
     self.backItem.enable = NO;
@@ -226,11 +247,9 @@ static ReadFrame* _instance = nil;
         if (weakSelf.extensionsMgr.currentAnnot) {
             [weakSelf.extensionsMgr setCurrentAnnot:nil];
         }
-        
+
         if (![weakSelf.pdfViewCtrl.currentDoc isModified]) {
-            UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
-            UIViewController *rootViewController = keyWindow.rootViewController;
-            [rootViewController dismissViewControllerAnimated:YES completion:nil];
+            [ReactNativeFoxitPdf close];
             [weakSelf.pdfViewCtrl closeDoc:nil];
         }
         else
@@ -253,18 +272,18 @@ static ReadFrame* _instance = nil;
             UIView *line = [[UIView alloc] initWithFrame:CGRectMake(10, 50, 130, 1)];
             line.backgroundColor = [UIColor colorWithRed:0.92 green:0.92 blue:0.92 alpha:1];
             [menu addSubview:line];
-            
+
             CGRect frame = item.contentView.frame;
             CGPoint startPoint = CGPointMake(CGRectGetMidX(frame), CGRectGetMaxY(frame));
             weakSelf.popover = [DXPopover popover];
             [weakSelf.popover showAtPoint:startPoint popoverPosition:DXPopoverPositionDown withContentView:menu inView:weakSelf.pdfViewCtrl];
             weakSelf.popover.didDismissHandler = ^{
-                
+
             };
         }
     };
     [self.topToolbar addItem:self.backItem displayPosition:Position_LT];
-    
+
     //Adding reading bookmark button.
     self.bookmarkItem = [TbBaseItem createItemWithImage:[UIImage imageNamed:@"readview_bookmark.png"] imageSelected:[UIImage imageNamed:@"readview_bookmarkselect.png"] imageDisable:nil];
     self.bookmarkItem.tag = 100;
@@ -272,7 +291,7 @@ static ReadFrame* _instance = nil;
         if ([weakSelf.extensionsMgr currentAnnot]) {
             [weakSelf.extensionsMgr setCurrentAnnot:nil];
         }
-        
+
         int currentPage = [weakSelf.pdfViewCtrl getCurrentPage];
         if ([_pdfViewCtrl getPageLayoutMode] == PDF_LAYOUT_MODE_TWO) {
             currentPage = currentPage / 2 * 2;
@@ -288,10 +307,10 @@ static ReadFrame* _instance = nil;
             weakSelf.bookmarkItem.selected = NO;
         }
         [weakSelf.panelController reloadReadingBookmarkPanel];
-        
+
     };
     [self.topToolbar addItem:self.bookmarkItem displayPosition:Position_RB];
-    
+
     //search button.
     TbBaseItem *searchItem = [TbBaseItem createItemWithImage:[UIImage imageNamed:@"search.png"]
                                                imageSelected:[UIImage imageNamed:@"search.png"]
@@ -306,7 +325,7 @@ static ReadFrame* _instance = nil;
         [self.extensionsMgr showSearchBar:YES];
     };
     [self.topToolbar addItem:searchItem displayPosition:Position_RB];
-    
+
     UIImage *commonReadMore = [UIImage imageNamed:@"common_read_more"];
     UIImage *annoToolitembg = [UIImage imageNamed:@"annotation_toolitembg"];
     self.moreAnnotItem = [TbBaseItem createItemWithImage:commonReadMore imageSelected:commonReadMore imageDisable:commonReadMore background:annoToolitembg];
@@ -318,7 +337,7 @@ static ReadFrame* _instance = nil;
         weakSelf.hiddenMoreToolsBar = NO;
     };
     [self.editBar addItem:self.moreAnnotItem displayPosition:DEVICE_iPHONE?Position_RB:Position_CENTER];
-    
+
     UIImage *commonBackBlue = [UIImage imageNamed:@"common_back_blue"];
     TbBaseItem *doneItem = [TbBaseItem createItemWithImage:commonBackBlue imageSelected:commonBackBlue imageDisable:commonBackBlue background:nil];
     doneItem.tag = 0;
@@ -329,7 +348,7 @@ static ReadFrame* _instance = nil;
             [weakSelf.extensionsMgr setCurrentAnnot:nil];
         }
         [self changeState:STATE_NORMAL];
-        
+
     };
 
     UIImage *readPanel = [UIImage imageNamed:@"read_panel"];
@@ -343,7 +362,7 @@ static ReadFrame* _instance = nil;
         self.panelController.isHidden = NO;
     };
     [self.bottomToolbar addItem:panelItem displayPosition:Position_CENTER];
-    
+
     UIImage *readModeImg = [UIImage imageNamed:@"read_mode"];
     TbBaseItem *readmodeItem = [TbBaseItem createItemWithImageAndTitle:NSLocalizedString(@"kReadView", nil) imageNormal:readModeImg imageSelected:readModeImg imageDisable:readModeImg background:nil imageTextRelation:RELATION_BOTTOM];
     readmodeItem.textColor = [UIColor blackColor];
@@ -355,30 +374,35 @@ static ReadFrame* _instance = nil;
         self.hiddenSettingBar = NO;
     };
     [self.bottomToolbar addItem:readmodeItem displayPosition:Position_CENTER];
-    
-    UIImage *readAnnotImg = [UIImage imageNamed:@"read_annot"];
-    self.annotItem = [TbBaseItem createItemWithImageAndTitle:NSLocalizedString(@"kReadComment", nil) imageNormal:readAnnotImg imageSelected:readAnnotImg imageDisable:readAnnotImg background:nil imageTextRelation:RELATION_BOTTOM];
-    self.annotItem.textColor = [UIColor blackColor];
-    self.annotItem.textFont = [UIFont systemFontOfSize:9.f];
-    self.annotItem.onTapClick = ^(TbBaseItem *item){
-        if (weakSelf.extensionsMgr.currentAnnot) {
-            [weakSelf.extensionsMgr setCurrentAnnot:nil];
-        }
-        [weakSelf changeState:STATE_EDIT];
-    };
-    [self.bottomToolbar addItem:self.annotItem displayPosition:Position_CENTER];
 
-    UIImage *signatureImg = [UIImage imageNamed:@"signature"];
-    self.signatureItem = [TbBaseItem createItemWithImageAndTitle:NSLocalizedString(@"kSignatureTitle", nil) imageNormal:signatureImg imageSelected:signatureImg imageDisable:signatureImg background:nil imageTextRelation:RELATION_BOTTOM];
-    self.signatureItem.textColor = [UIColor blackColor];
-    self.signatureItem.textFont = [UIFont systemFontOfSize:9.f];
-    [self.bottomToolbar addItem:self.signatureItem displayPosition:Position_CENTER];
-    
-    
-    panelItem.contentView.center = CGPointMake(SCREENWIDTH/5, 25);
-    readmodeItem.contentView.center = CGPointMake(SCREENWIDTH*2/5, 25);
-    self.annotItem.contentView.center = CGPointMake(SCREENWIDTH*3/5, 25);
-    self.signatureItem.contentView.center = CGPointMake(SCREENWIDTH*4/5, 25);
+    if(!self.isReadOnly) {
+        UIImage *readAnnotImg = [UIImage imageNamed:@"read_annot"];
+        self.annotItem = [TbBaseItem createItemWithImageAndTitle:NSLocalizedString(@"kReadComment", nil) imageNormal:readAnnotImg imageSelected:readAnnotImg imageDisable:readAnnotImg background:nil imageTextRelation:RELATION_BOTTOM];
+        self.annotItem.textColor = [UIColor blackColor];
+        self.annotItem.textFont = [UIFont systemFontOfSize:9.f];
+        self.annotItem.onTapClick = ^(TbBaseItem *item){
+            if (weakSelf.extensionsMgr.currentAnnot) {
+                [weakSelf.extensionsMgr setCurrentAnnot:nil];
+            }
+            [weakSelf changeState:STATE_EDIT];
+        };
+        [self.bottomToolbar addItem:self.annotItem displayPosition:Position_CENTER];
+
+        BOOL isSignaureEnabled = [[self.options valueForKey:@"isSignaureEnabled"] boolValue];
+        if (isSignaureEnabled) {
+          UIImage *signatureImg = [UIImage imageNamed:@"signature"];
+          self.signatureItem = [TbBaseItem createItemWithImageAndTitle:NSLocalizedString(@"kSignatureTitle", nil) imageNormal:signatureImg imageSelected:signatureImg imageDisable:signatureImg background:nil imageTextRelation:RELATION_BOTTOM];
+          self.signatureItem.textColor = [UIColor blackColor];
+          self.signatureItem.textFont = [UIFont systemFontOfSize:9.f];
+          [self.bottomToolbar addItem:self.signatureItem displayPosition:Position_CENTER];
+        }
+    }
+
+    int sectionWidth = SCREENWIDTH/5;
+    panelItem.contentView.center = CGPointMake((sectionWidth * 2) - sectionWidth / 2, 25);
+    readmodeItem.contentView.center = CGPointMake((sectionWidth * 3) - sectionWidth / 2, 25);
+    self.annotItem.contentView.center = CGPointMake((sectionWidth * 4) - sectionWidth / 2, 25);
+//    self.signatureItem.contentView.center = CGPointMake(SCREENWIDTH*4/5, 25);
 
 }
 
@@ -399,10 +423,8 @@ static ReadFrame* _instance = nil;
     self.popover = nil;
     [ReactNativeFoxitPdf setIsFileEdited:YES];
     _isDocModified = NO;
-    UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
-    UIViewController *rootViewController = keyWindow.rootViewController;
-    [rootViewController dismissViewControllerAnimated:YES completion:nil];
-   
+    [ReactNativeFoxitPdf close];
+
     NSString* tmpPath = nil;
     NSString* filePath = [ReactNativeFoxitPdf getFilePath];
     if(filePath)
@@ -411,7 +433,7 @@ static ReadFrame* _instance = nil;
         tmpPath = [tempDir stringByAppendingPathComponent:[filePath lastPathComponent]];
         [self.pdfViewCtrl saveDoc:tmpPath flag:e_saveFlagIncremental];
     }
-    
+
     [self.pdfViewCtrl closeDoc:^()
      {
          if(filePath)
@@ -435,9 +457,7 @@ static ReadFrame* _instance = nil;
     self.popover = nil;
     [ReactNativeFoxitPdf setIsFileEdited:NO];
     _isDocModified = NO;
-    UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
-    UIViewController *rootViewController = keyWindow.rootViewController;
-    [rootViewController dismissViewControllerAnimated:YES completion:nil];
+    [ReactNativeFoxitPdf close];
     [self.pdfViewCtrl closeDoc:nil];
 }
 
@@ -519,7 +539,7 @@ static ReadFrame* _instance = nil;
         CGRect newFrame = self.editDoneBar.contentView.frame;
         newFrame.origin.y = -self.editDoneBar.contentView.frame.size.height;
         [UIView animateWithDuration:0.3 animations:^{
-            
+
             self.editDoneBar.contentView.frame = newFrame;
             [self.editDoneBar.contentView mas_remakeConstraints:^(MASConstraintMaker *make) {
                 make.height.mas_equalTo(@64);
@@ -527,9 +547,9 @@ static ReadFrame* _instance = nil;
                 make.left.equalTo(self.pdfViewCtrl.mas_left).offset(0);
                 make.bottom.equalTo(self.pdfViewCtrl.mas_top).offset(0);
             }];
-            
+
         } completion:^(BOOL finished) {
-            
+
         }];
     }
     else
@@ -568,7 +588,7 @@ static ReadFrame* _instance = nil;
                 make.top.equalTo(self.pdfViewCtrl.mas_bottom).offset(0);
             }];
         }];
-        
+
     }
     else
     {
@@ -581,10 +601,10 @@ static ReadFrame* _instance = nil;
                 make.left.equalTo(self.pdfViewCtrl.mas_left).offset(0);
                 make.right.equalTo(self.pdfViewCtrl.mas_right).offset(0);
                 make.bottom.equalTo(self.pdfViewCtrl.mas_bottom).offset(0);
-                
+
             }];
         }];
-        
+
     }
 }
 
@@ -624,7 +644,7 @@ static ReadFrame* _instance = nil;
         } completion:^(BOOL finished) {
         }];
     }
-    
+
 }
 
 -(void)setHiddenMoreToolsBar:(BOOL)hiddenMoreToolsBar
@@ -639,10 +659,10 @@ static ReadFrame* _instance = nil;
             [UIView animateWithDuration:0.4 animations:^{
                 maskView.alpha = 0.1f;
             } completion:^(BOOL finished) {
-                
+
                 [maskView removeFromSuperview];
             }];
-            
+
             CGRect newFrame = self.moreToolsBar.contentView.frame;
             if (DEVICE_iPHONE)
             {
@@ -652,7 +672,7 @@ static ReadFrame* _instance = nil;
             {
                 newFrame.origin.x = [UIScreen mainScreen].bounds.size.width;
             }
-            
+
             [UIView animateWithDuration:0.4 animations:^{
                 self.moreToolsBar.contentView.frame = newFrame;
                 [self.moreToolsBar.contentView mas_remakeConstraints:^(MASConstraintMaker *make) {
@@ -660,7 +680,7 @@ static ReadFrame* _instance = nil;
                     make.left.equalTo(self.pdfViewCtrl.mas_left).offset(0);
                     make.right.equalTo(self.pdfViewCtrl.mas_right).offset(0);
                     make.height.mas_equalTo(self.moreToolsBar.contentView.frame.size.height);
-                    
+
                 }];
             }];
         }
@@ -709,7 +729,7 @@ static ReadFrame* _instance = nil;
             {
                 [self.moreToolbarPopoverCtr presentPopoverFromRect:self.moreAnnotItem.contentView.bounds inView:self.moreAnnotItem.contentView permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
             }
-            
+
         }
         else
         {
@@ -718,7 +738,7 @@ static ReadFrame* _instance = nil;
             }
         }
     }
-    
+
 }
 
 -(UIPopoverController *)moreToolbarPopoverCtr
@@ -728,14 +748,14 @@ static ReadFrame* _instance = nil;
         UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 300, 250)];
         [view addSubview:self.moreToolsBar.contentView];
         [viewCtr.view addSubview:view];
-        
+
         [self.moreToolsBar.contentView mas_makeConstraints:^(MASConstraintMaker *make) {
             make.left.equalTo(view.mas_left).offset(0);
             make.right.equalTo(view.mas_right).offset(0);
             make.top.equalTo(view.mas_top).offset(0);
             make.bottom.equalTo(view.mas_bottom).offset(0);
         }];
-        
+
         _moreToolbarPopoverCtr = [[UIPopoverController alloc] initWithContentViewController:viewCtr];
         self.moreToolbarPopoverCtr.delegate = self;
         [self.moreToolbarPopoverCtr setPopoverContentSize:CGSizeMake(300, 250)];
@@ -759,13 +779,13 @@ static ReadFrame* _instance = nil;
         [UIView animateWithDuration:0.4 animations:^{
             maskView.alpha = 0.1f;
         } completion:^(BOOL finished) {
-            
+
             [maskView removeFromSuperview];
         }];
-        
-        
+
+
         CGRect newFrame = [self.more getContentView].frame;
-        
+
         if (!OS_ISVERSION8 && UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
             newFrame.origin.x = [UIScreen mainScreen].bounds.size.height;
         }
@@ -773,9 +793,9 @@ static ReadFrame* _instance = nil;
         {
             newFrame.origin.x = [UIScreen mainScreen].bounds.size.width;
         }
-        
+
         [UIView animateWithDuration:0.4 animations:^{
-            
+
             [self.more getContentView].frame = newFrame;
             [[self.more getContentView] mas_remakeConstraints:^(MASConstraintMaker *make) {
                 make.top.equalTo(self.pdfViewCtrl.mas_top).offset(0);
@@ -790,19 +810,19 @@ static ReadFrame* _instance = nil;
                     make.width.mas_equalTo(300);
                 }
             }];
-            
+
         }];
     }
     else
     {
         [self.extensionsMgr stopFormFilling];
-        
+
         maskView.frame = [UIScreen mainScreen].bounds;
         maskView.backgroundColor = [UIColor blackColor];
         maskView.alpha = 0.3f;
         maskView.tag = 201;
         [maskView addTarget:self action:@selector(dissmiss:) forControlEvents:UIControlEventTouchUpInside];
-        
+
         [self.pdfViewCtrl insertSubview:maskView belowSubview:[self.more getContentView]];
         [maskView mas_remakeConstraints:^(MASConstraintMaker *make) {
             make.left.equalTo(maskView.superview.mas_left).offset(0);
@@ -810,9 +830,9 @@ static ReadFrame* _instance = nil;
             make.top.equalTo(maskView.superview.mas_top).offset(0);
             make.bottom.equalTo(maskView.superview.mas_bottom).offset(0);
         }];
-        
+
         CGRect newFrame = [self.more getContentView].frame;
-        
+
         if (DEVICE_iPHONE)
         {
             newFrame.origin.x = 0;
@@ -826,9 +846,9 @@ static ReadFrame* _instance = nil;
             {
                newFrame.origin.x = [UIScreen mainScreen].bounds.size.width-[self.more getContentView].frame.size.width;
             }
-            
+
         }
-        
+
         [UIView animateWithDuration:0.4 animations:^{
             [self.more getContentView].frame = newFrame;
             [[self.more getContentView] mas_remakeConstraints:^(MASConstraintMaker *make) {
@@ -920,7 +940,7 @@ static ReadFrame* _instance = nil;
         [self changeState:STATE_THUMBNAIL];
     else
         [self changeState:STATE_NORMAL];
-    
+
     [self.settingBarController onLayoutModeChanged:oldLayoutMode newLayoutMode:newLayoutMode];
     [self updateBookmarkButtonState];
 }
@@ -997,7 +1017,7 @@ static ReadFrame* _instance = nil;
             [self.moreToolbarPopoverCtr presentPopoverFromRect:self.moreAnnotItem.contentView.bounds inView:self.moreAnnotItem.contentView permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
         }
     }
-	
+
     if (self.rotateListeners.count > 0) {
         for (id<IRotationEventListener> listener in self.rotateListeners) {
             if ([listener respondsToSelector:@selector(didRotateFromInterfaceOrientation:)]) {
@@ -1050,7 +1070,7 @@ static ReadFrame* _instance = nil;
             }
         }
     }
-    
+
 }
 
 -(int)getState
@@ -1072,7 +1092,7 @@ static ReadFrame* _instance = nil;
 
 - (void)onDocWillOpen
 {
-    
+
 }
 
 - (void)onDocOpened:(FSPDFDoc* )document error:(int)error
@@ -1085,7 +1105,7 @@ static ReadFrame* _instance = nil;
 
     [self.topToolbar removeCenterItems];
     [self updateBookmarkButtonState];
-    
+
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([Utility canAssembleDocument:document ]) {
             self.bookmarkItem.button.userInteractionEnabled = YES;
@@ -1099,7 +1119,7 @@ static ReadFrame* _instance = nil;
 
 - (void)onDocWillClose:(FSPDFDoc* )document
 {
-    
+
 }
 
 - (void)onDocClosed:(FSPDFDoc* )document error:(int)error
@@ -1110,7 +1130,7 @@ static ReadFrame* _instance = nil;
 
 -(void)onDocWillSave:(FSPDFDoc *)document
 {
-    
+
 }
 
 
@@ -1194,18 +1214,19 @@ static ReadFrame* _instance = nil;
 #pragma mark - IPageEventListener
 - (void)onPageVisible:(int)index
 {
-    
-    
+
+
 }
 - (void)onPageInvisible:(int)index
 {
-    
-    
+
+
 }
 - (void)onPageChanged:(int)oldIndex currentIndex:(int)currentIndex;
 {
     [self updateBookmarkButtonState];
 }
+
 
 
 - (void)dealloc
