@@ -399,10 +399,19 @@ static ReadFrame* _instance = nil;
     }
 
     int sectionWidth = SCREENWIDTH/5;
-    panelItem.contentView.center = CGPointMake((sectionWidth * 2) - sectionWidth / 2, 25);
-    readmodeItem.contentView.center = CGPointMake((sectionWidth * 3) - sectionWidth / 2, 25);
-    self.annotItem.contentView.center = CGPointMake((sectionWidth * 4) - sectionWidth / 2, 25);
-//    self.signatureItem.contentView.center = CGPointMake(SCREENWIDTH*4/5, 25);
+    if (self.isReadOnly) {
+      sectionWidth = SCREENWIDTH/6;
+    }
+    int modifier = 0;
+    if (self.isReadOnly) {
+      modifier = 1;
+    }
+    panelItem.contentView.center = CGPointMake((sectionWidth * (2 + modifier)) - sectionWidth / 2, 25);
+    readmodeItem.contentView.center = CGPointMake((sectionWidth * (3 + modifier)) - sectionWidth / 2, 25);
+    if (!self.isReadOnly) {
+      self.annotItem.contentView.center = CGPointMake((sectionWidth * (4 + modifier)) - sectionWidth / 2, 25);
+      // self.signatureItem.contentView.center = CGPointMake(SCREENWIDTH*4/5, 25);
+    }
 
 }
 

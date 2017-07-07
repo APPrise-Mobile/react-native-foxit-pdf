@@ -765,7 +765,7 @@
             [self.scrollView removeFromSuperview];
             float spaceWidth = 30;
             float tempWidth = 0;
-            self.reflowBtn.frame = CGRectMake(20 + tempWidth, 180, self.reflowBtn.frame.size.width, self.reflowBtn.frame.size.height);
+            self.reflowBtn.frame = CGRectMake(20 + tempWidth, 80, self.reflowBtn.frame.size.width, self.reflowBtn.frame.size.height);
             self.reflowBtn.center = CGPointMake((a -20)/12, self.reflowBtn.center.y);
 
             tempWidth += self.reflowBtn.frame.size.width + spaceWidth;
@@ -784,7 +784,7 @@
             [self.reflowBtn removeFromSuperview];
             [self.screenLockBtn removeFromSuperview];
             [self.scrollView removeFromSuperview];
-            self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 180, STYLE_CELLWIDTH_IPHONE, 80)];
+            self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 80, STYLE_CELLWIDTH_IPHONE, 80)];
             [self.contentView addSubview:self.scrollView];
             self.scrollView.scrollEnabled = YES;
             self.scrollView.directionalLockEnabled = NO;
