@@ -43,7 +43,7 @@ public class ReactNativeFoxitPdfActivity extends AppCompatActivity {
         final String UIExtensionsConfig = "{\n" +
             "    \"defaultReader\": true,\n" +
             "    \"modules\": {\n" +
-            "        \"readingbookmark\": true,\n" +
+            "        \"readingbookmark\": " + annotationsEnabledString + ",\n" +
             "        \"outline\": true,\n" +
             "        \"annotations\": " + annotationsEnabledString + ",\n" +
             "        \"thumbnail\" : false,\n" +
