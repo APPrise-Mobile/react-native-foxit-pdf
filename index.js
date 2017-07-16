@@ -1,6 +1,6 @@
 import { Platform, NativeModules } from 'react-native'
 
-const ReactNativeFoxitPdf = React.NativeModules.ReactNativeFoxitPdf;
+const ReactNativeFoxitPdf = NativeModules.ReactNativeFoxitPdf;
 
 export default {
   init: (sn, key, onSuccess, onFailure) => {
