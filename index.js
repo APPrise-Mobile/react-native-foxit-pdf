@@ -19,7 +19,7 @@ export default {
     if (os === 'ios') {
       return ReactNativeFoxitPdf.openPdf(uri, options, () => {});
     } else if (os === 'android') {
-      return ReactNativeFoxitPdf.openPdf(uri, !options.isReadOnly, onSuccess, onFailure);
+      return ReactNativeFoxitPdf.openPdf(uri, !options.isReadOnly, () => {}, () => {});
     } else {
       throw new Error('unsupported os: ' + os)
     }
