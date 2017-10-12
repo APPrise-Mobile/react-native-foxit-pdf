@@ -81,6 +81,7 @@ public class ReactNativeFoxitPdfActivity extends AppCompatActivity {
             public void onDocOpened(PDFDoc document, int errCode) {
                 pdfViewCtrl.setZoomMode(ZOOMMODE_FITHEIGHT);
                 pdfViewCtrl.setZoomMode(ZOOMMODE_FITWIDTH);
+                pdfViewCtrl.updatePagesLayout();
             }
 
             public void onDocWillClose(PDFDoc document) {
