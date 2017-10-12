@@ -2,6 +2,7 @@ package com.apprisemobile.foxitpdf;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
@@ -23,6 +24,7 @@ import static com.foxit.sdk.PDFViewCtrl.ZOOMMODE_FITWIDTH;
 
 public class ReactNativeFoxitPdfActivity extends AppCompatActivity {
     public PDFReader mPDFReader;
+    private boolean resetZoomOnNextDraw = false;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -74,6 +76,23 @@ public class ReactNativeFoxitPdfActivity extends AppCompatActivity {
 
         mPDFReader= (PDFReader) uiextensionsManager.getPDFReader();
         mPDFReader.onCreate(this, pdfViewCtrl, savedInstanceState);
+        uiextensionsManager.registerConfigurationChangedListener(new UIExtensionsManager.ConfigurationChangedListener() {
+            @Override
+            public void onConfigurationChanged(Configuration configuration) {
+                resetZoomOnNextDraw = true;
+            }
+        });
+        pdfViewCtrl.registerDrawEventListener(new PDFViewCtrl.IDrawEventListener() {
+            @Override
+            public void onDraw(int i, Canvas canvas) {
+                if (resetZoomOnNextDraw) {
+                    resetZoomOnNextDraw = false;
+                    pdfViewCtrl.setZoomMode(ZOOMMODE_FITHEIGHT);
+                    pdfViewCtrl.setZoomMode(ZOOMMODE_FITWIDTH);
+                    pdfViewCtrl.updatePagesLayout();
+                }
+            }
+        });
         pdfViewCtrl.registerDocEventListener(new PDFViewCtrl.IDocEventListener() {
             public void onDocWillOpen() {
             }
