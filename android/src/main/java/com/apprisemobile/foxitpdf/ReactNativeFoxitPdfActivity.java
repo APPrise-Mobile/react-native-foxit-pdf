@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.WindowManager;
 
 import com.foxit.sdk.PDFViewCtrl;
+import com.foxit.sdk.pdf.PDFDoc;
 import com.foxit.uiextensions.UIExtensionsManager;
 import com.foxit.uiextensions.pdfreader.impl.MainFrame;
 import com.foxit.uiextensions.pdfreader.impl.PDFReader;
@@ -16,6 +17,9 @@ import com.foxit.uiextensions.pdfreader.impl.PDFReader;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
+
+import static com.foxit.sdk.PDFViewCtrl.ZOOMMODE_FITHEIGHT;
+import static com.foxit.sdk.PDFViewCtrl.ZOOMMODE_FITWIDTH;
 
 public class ReactNativeFoxitPdfActivity extends AppCompatActivity {
     public PDFReader mPDFReader;
@@ -70,6 +74,27 @@ public class ReactNativeFoxitPdfActivity extends AppCompatActivity {
 
         mPDFReader= (PDFReader) uiextensionsManager.getPDFReader();
         mPDFReader.onCreate(this, pdfViewCtrl, savedInstanceState);
+        pdfViewCtrl.registerDocEventListener(new PDFViewCtrl.IDocEventListener() {
+            public void onDocWillOpen() {
+            }
+
+            public void onDocOpened(PDFDoc document, int errCode) {
+                pdfViewCtrl.setZoomMode(ZOOMMODE_FITHEIGHT);
+                pdfViewCtrl.setZoomMode(ZOOMMODE_FITWIDTH);
+            }
+
+            public void onDocWillClose(PDFDoc document) {
+            }
+
+            public void onDocClosed(PDFDoc document, int errCode) {
+            }
+
+            public void onDocWillSave(PDFDoc document) {
+            }
+
+            public void onDocSaved(PDFDoc document, int errCode) {
+            }
+        });
         mPDFReader.openDocument(path, null);
         setContentView(mPDFReader.getContentView());
     }
