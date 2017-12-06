@@ -33,13 +33,13 @@ class ReactNativeFoxitPdfModule extends ReactContextBaseJavaModule {
     private void init(final String sn, final String key, final Callback onSuccess, final Callback onFailure) {
         try {
             Library.init(sn, key);
+            errCode = PDFException.e_errSuccess;
+            onSuccess.invoke("Succeed to initialize Foxit library.");
         } catch (PDFException e) {
             errCode = e.getLastError();
+            e.printStackTrace();
             onFailure.invoke("Failed to initialize Foxit library.");
         }
-
-        errCode = PDFException.e_errSuccess;
-        onSuccess.invoke("Succeed to initialize Foxit library.");
     }
 
     @ReactMethod
