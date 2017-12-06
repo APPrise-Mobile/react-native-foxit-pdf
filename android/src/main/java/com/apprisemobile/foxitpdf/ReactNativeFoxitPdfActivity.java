@@ -53,7 +53,7 @@ public class ReactNativeFoxitPdfActivity extends AppCompatActivity {
             "        \"readingbookmark\": " + annotationsEnabledString + ",\n" +
             "        \"outline\": true,\n" +
             "        \"annotations\": {\n" +
-            "          \"highlight\": true,\n" +
+            "          \"highlight\": " + annotationsEnabledString + ",\n" +
             "          \"underline\": " + annotationsEnabledString + ",\n" +
             "          \"squiggly\": " + annotationsEnabledString + ",\n" +
             "          \"strikeout\": " + annotationsEnabledString + ",\n" +
