@@ -218,6 +218,7 @@ public class ReactNativeFoxitPdfActivity extends AppCompatActivity {
     }
 
     private void finishActivity() {
+        this.context.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("PdfClosed", null);
         this.finish();
     }
 }

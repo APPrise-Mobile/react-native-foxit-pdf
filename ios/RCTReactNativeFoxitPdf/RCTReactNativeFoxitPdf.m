@@ -138,11 +138,11 @@ RCT_EXPORT_METHOD(openPdf:(NSString *)path
     [ReactNativeFoxitPdf openPDFAtPath:path withPassword:nil];
 }
 
-//-(void)didDismissDocumentController:(NSNotification *)notification {
-//  [[NSNotificationCenter defaultCenter] removeObserver:self];
-//  NSDictionary* saveResults = [notification object];
-//  [self.bridge.eventDispatcher sendAppEventWithName:@"PdfSaved"
-//                               body:saveResults];
-//}
+-(void)didDismissDocumentController:(NSNotification *)notification {
+ [[NSNotificationCenter defaultCenter] removeObserver:self];
+ NSDictionary* saveResults = [notification object];
+ [self.bridge.eventDispatcher sendAppEventWithName:@"PdfClosed"
+                              body:saveResults];
+}
 
 @end
