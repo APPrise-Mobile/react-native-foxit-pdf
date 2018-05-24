@@ -11,6 +11,8 @@ static RCTEventDispatcher* eventDispatcher = nil;
 
 @implementation ReactNativeFoxitPdf
 
+@synthesize bridge = _bridge;
+
 + (FSPDFViewCtrl*)getPdfViewCtrl {
     return pdfViewCtrl;
 }
@@ -78,6 +80,7 @@ static RCTEventDispatcher* eventDispatcher = nil;
 + (void)close {
     UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
     UIViewController *rootViewController = keyWindow.rootViewController;
+
     [rootViewController dismissViewControllerAnimated:TRUE completion:^{
         [eventDispatcher sendAppEventWithName:@"PdfClosed" body:nil];
     }];
@@ -131,6 +134,7 @@ RCT_EXPORT_METHOD(init:(NSString *)serial
     if (e_errSuccess != eRet) {
       callback(@[[NSNull null], @"FoxitPdf: Invalid license"]);
     } else {
+      [ReactNativeFoxitPdf setEventDispatcher:self.bridge.eventDispatcher];
       callback(@[[NSNull null], @"FoxitPdf: init success"]);
     }
 }
@@ -141,16 +145,10 @@ RCT_EXPORT_METHOD(openPdf:(NSString *)path
 {
     FSPDFViewCtrl *pdfViewCtrl = [[FSPDFViewCtrl alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     [ReactNativeFoxitPdf setPdfViewCtrl:pdfViewCtrl];
-    [ReactNativeFoxitPdf setEventDispatcher:self.bridge.eventDispatcher];
 
     ReadFrame *readFrame = [[ReadFrame alloc] initWithPdfViewCtrl:pdfViewCtrl options:options];
     [ReactNativeFoxitPdf setReadFrame:readFrame];
     [ReactNativeFoxitPdf openPDFAtPath:path withPassword:nil];
 }
-
-//  -(void)didDismissDocumentController:(NSNotification *)notification {
-//   [[NSNotificationCenter defaultCenter] removeObserver:self];
-//   [self.bridge.eventDispatcher sendAppEventWithName:@"PdfSaved" body:nil];
-//  }
 
 @end
