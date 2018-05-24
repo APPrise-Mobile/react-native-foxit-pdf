@@ -7,6 +7,7 @@ static NSString* filePath = nil;
 static NSString* password = nil;
 static BOOL isScreenLocked = FALSE;
 static BOOL isFiledEdited = FALSE;
+static RCTEventDispatcher* eventDispatcher = nil;
 
 @implementation ReactNativeFoxitPdf
 
@@ -17,6 +18,12 @@ static BOOL isFiledEdited = FALSE;
 + (void)setPdfViewCtrl:(FSPDFViewCtrl*)newPdfViewCtrl {
     if(pdfViewCtrl != newPdfViewCtrl) {
         pdfViewCtrl = newPdfViewCtrl;
+    }
+}
+
++ (void)setEventDispatcher:(RCTEventDispatcher*)newEventDispatcher {
+    if (eventDispatcher != newEventDispatcher) {
+        eventDispatcher = newEventDispatcher;
     }
 }
 
@@ -71,7 +78,9 @@ static BOOL isFiledEdited = FALSE;
 + (void)close {
     UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
     UIViewController *rootViewController = keyWindow.rootViewController;
-    [rootViewController dismissViewControllerAnimated:TRUE completion:nil];
+    [rootViewController dismissViewControllerAnimated:TRUE completion:^{
+        [eventDispatcher sendAppEventWithName:@"PdfClosed" body:nil];
+    }];
 }
 
 + (BOOL)openPDFAtPath:(NSString*)path withPassword:(NSString*)password
@@ -132,17 +141,16 @@ RCT_EXPORT_METHOD(openPdf:(NSString *)path
 {
     FSPDFViewCtrl *pdfViewCtrl = [[FSPDFViewCtrl alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     [ReactNativeFoxitPdf setPdfViewCtrl:pdfViewCtrl];
+    [ReactNativeFoxitPdf setEventDispatcher:self.bridge.eventDispatcher];
 
     ReadFrame *readFrame = [[ReadFrame alloc] initWithPdfViewCtrl:pdfViewCtrl options:options];
     [ReactNativeFoxitPdf setReadFrame:readFrame];
     [ReactNativeFoxitPdf openPDFAtPath:path withPassword:nil];
 }
 
--(void)didDismissDocumentController:(NSNotification *)notification {
- [[NSNotificationCenter defaultCenter] removeObserver:self];
- NSDictionary* saveResults = [notification object];
- [self.bridge.eventDispatcher sendAppEventWithName:@"PdfClosed"
-                              body:saveResults];
-}
+//  -(void)didDismissDocumentController:(NSNotification *)notification {
+//   [[NSNotificationCenter defaultCenter] removeObserver:self];
+//   [self.bridge.eventDispatcher sendAppEventWithName:@"PdfSaved" body:nil];
+//  }
 
 @end

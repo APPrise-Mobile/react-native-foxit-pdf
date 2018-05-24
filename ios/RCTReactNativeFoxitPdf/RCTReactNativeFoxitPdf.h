@@ -14,6 +14,8 @@
 + (FSPDFViewCtrl*)getPdfViewCtrl;
 + (void)setPdfViewCtrl:(FSPDFViewCtrl*)newPdfViewCtrl;
 
++ (void)setEventDispatcher:(RCTEventDispatcher*)newEventDispatcher;
+
 + (ReadFrame*)getReadFrame;
 + (void)setReadFrame:(ReadFrame*)newReadFrame;
 
