@@ -9,6 +9,9 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.WindowManager;
 
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
+
 import com.foxit.sdk.PDFViewCtrl;
 import com.foxit.sdk.pdf.PDFDoc;
 import com.foxit.uiextensions.UIExtensionsManager;
@@ -218,7 +221,8 @@ public class ReactNativeFoxitPdfActivity extends AppCompatActivity {
     }
 
     private void finishActivity() {
-        this.context.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("PdfClosed", null);
+        final ReactContext reactContext = (ReactContext) this.getApplicationContext();
+        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("PdfClosed", null);
         this.finish();
     }
 }
